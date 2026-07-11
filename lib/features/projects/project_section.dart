@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:portfolio/core/utils/resposive.dart';
-import 'package:portfolio/data/models/project_model.dart';
+import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/features/projects/widgets/project_card.dart';
 import 'package:portfolio/widgets/common/section_container.dart';
 import 'package:portfolio/widgets/common/section_header.dart';
 import 'package:portfolio/widgets/glass/glass_arrow_button.dart';
+import 'package:provider/provider.dart';
 
 class ProjectSection extends StatefulWidget {
   const ProjectSection({super.key});
@@ -44,9 +45,10 @@ class _ProjectSectionState extends State<ProjectSection> {
   }
 
   void _goTo(int delta) {
+    final count = context.read<ContentService>().content.projects.length;
     final page = (_pageCtrl!.page ?? 0).round() + delta;
     _pageCtrl!.animateToPage(
-      page.clamp(0, sampleProjects.length - 1),
+      page.clamp(0, count - 1),
       duration: const Duration(milliseconds: 450),
       curve: Curves.easeOutCubic,
     );
@@ -55,15 +57,17 @@ class _ProjectSectionState extends State<ProjectSection> {
   @override
   Widget build(BuildContext context) {
     final ctrl = _pageCtrl!;
+    final content = context.watch<ContentService>().content;
+    final projects = content.projects;
+    final header = content.section('projects');
 
     return SectionContainer(
       child: Column(
         children: [
-          const SectionHeader(
-            eyebrow: "WORK",
-            title: "Featured Projects",
-            subtitle:
-                "Products and experiments — from live platforms to open-source builds.",
+          SectionHeader(
+            eyebrow: header.eyebrow,
+            title: header.title,
+            subtitle: header.subtitle,
           ),
           const SizedBox(height: 28),
           SizedBox(
@@ -75,9 +79,9 @@ class _ProjectSectionState extends State<ProjectSection> {
                 return PageView.builder(
                   padEnds: false,
                   controller: ctrl,
-                  itemCount: sampleProjects.length,
+                  itemCount: projects.length,
                   itemBuilder: (context, index) {
-                    final project = sampleProjects[index];
+                    final project = projects[index];
                     final scale = isMobile
                         ? 1.0
                         : (1 - (currentPage - index).abs() * 0.15).clamp(
@@ -111,7 +115,7 @@ class _ProjectSectionState extends State<ProjectSection> {
                   final current = ctrl.hasClients ? (ctrl.page ?? 0) : 0.0;
                   return Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: List.generate(sampleProjects.length, (index) {
+                    children: List.generate(projects.length, (index) {
                       final isActive = current.round() == index;
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 300),

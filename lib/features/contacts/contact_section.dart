@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:portfolio/core/constants/app_colors.dart';
-import 'package:portfolio/core/constants/app_links.dart';
 import 'package:portfolio/core/utils/resposive.dart';
+import 'package:portfolio/data/models/portfolio_content.dart';
+import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/data/services/email_service.dart';
 import 'package:portfolio/data/services/urls_launcher_service.dart';
 import 'package:portfolio/widgets/common/section_container.dart';
@@ -90,17 +91,19 @@ class _ContactSectionState extends State<ContactSection> {
   @override
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
+    final content = context.watch<ContentService>().content;
+    final links = content.links;
+    final header = content.section('contact');
 
     return Consumer<EmailService>(
       builder: (context, emailService, child) {
         return SectionContainer(
           child: Column(
             children: [
-              const SectionHeader(
-                eyebrow: "CONTACT",
-                title: "Let's Build Something Exceptional",
-                subtitle:
-                    "Open to collaborations, internships, and ambitious digital experiences.",
+              SectionHeader(
+                eyebrow: header.eyebrow,
+                title: header.title,
+                subtitle: header.subtitle,
               ),
               const SizedBox(height: 28),
 
@@ -111,7 +114,7 @@ class _ContactSectionState extends State<ContactSection> {
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _leftSection(),
+                          _leftSection(links),
                           const SizedBox(height: 36),
                           _rightSection(emailService),
                         ],
@@ -119,7 +122,7 @@ class _ContactSectionState extends State<ContactSection> {
                     : Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: _leftSection()),
+                          Expanded(child: _leftSection(links)),
                           const SizedBox(width: 40),
                           Expanded(child: _rightSection(emailService)),
                         ],
@@ -132,26 +135,26 @@ class _ContactSectionState extends State<ContactSection> {
                 spacing: 14,
                 runSpacing: 14,
                 alignment: WrapAlignment.center,
-                children: const [
+                children: [
                   _SocialPill(
                     icon: Icons.code_rounded,
                     label: "GitHub",
-                    url: AppLinks.github,
+                    url: links.github,
                   ),
                   _SocialPill(
                     icon: Icons.business_center_rounded,
                     label: "LinkedIn",
-                    url: AppLinks.linkedin,
+                    url: links.linkedin,
                   ),
                   _SocialPill(
                     icon: Icons.camera_alt_rounded,
                     label: "Instagram",
-                    url: AppLinks.instagram,
+                    url: links.instagram,
                   ),
                   _SocialPill(
                     icon: Icons.mail_rounded,
                     label: "Email",
-                    url: AppLinks.email,
+                    url: links.email,
                   ),
                 ],
               ),
@@ -162,7 +165,7 @@ class _ContactSectionState extends State<ContactSection> {
     );
   }
 
-  Widget _leftSection() {
+  Widget _leftSection(LinksContent links) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -213,11 +216,11 @@ class _ContactSectionState extends State<ContactSection> {
         Wrap(
           spacing: 12,
           runSpacing: 12,
-          children: const [
-            _QuickActionPill(title: "Email", url: AppLinks.email),
-            _QuickActionPill(title: "Resume", url: AppLinks.resume),
-            _QuickActionPill(title: "GitHub", url: AppLinks.github),
-            _QuickActionPill(title: "LinkedIn", url: AppLinks.linkedin),
+          children: [
+            _QuickActionPill(title: "Email", url: links.email),
+            _QuickActionPill(title: "Resume", url: links.resume),
+            _QuickActionPill(title: "GitHub", url: links.github),
+            _QuickActionPill(title: "LinkedIn", url: links.linkedin),
           ],
         ),
       ],

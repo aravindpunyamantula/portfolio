@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:portfolio/core/constants/app_colors.dart';
-import 'package:portfolio/core/constants/app_links.dart';
+import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/data/services/urls_launcher_service.dart';
 import 'package:portfolio/widgets/glass/liquid_glass.dart';
+import 'package:provider/provider.dart';
 
 class AppFooter extends StatelessWidget {
   const AppFooter({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final content = context.watch<ContentService>().content;
+    final links = content.links;
     final year = DateTime.now().year;
     final isMobile = MediaQuery.of(context).size.width < 600;
 
@@ -52,10 +55,10 @@ class AppFooter extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                "Building scalable products with beautiful interfaces.",
+              Text(
+                content.hero.footerTagline,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white38, fontSize: 13),
+                style: const TextStyle(color: Colors.white38, fontSize: 13),
               ),
               const SizedBox(height: 24),
 
@@ -63,31 +66,31 @@ class AppFooter extends StatelessWidget {
                 spacing: 12,
                 runSpacing: 12,
                 alignment: WrapAlignment.center,
-                children: const [
+                children: [
                   _FooterIcon(
                     icon: Icons.code_rounded,
                     tooltip: "GitHub",
-                    url: AppLinks.github,
+                    url: links.github,
                   ),
                   _FooterIcon(
                     icon: Icons.business_center_rounded,
                     tooltip: "LinkedIn",
-                    url: AppLinks.linkedin,
+                    url: links.linkedin,
                   ),
                   _FooterIcon(
                     icon: Icons.camera_alt_rounded,
                     tooltip: "Instagram",
-                    url: AppLinks.instagram,
+                    url: links.instagram,
                   ),
                   _FooterIcon(
                     icon: Icons.mail_rounded,
                     tooltip: "Email",
-                    url: AppLinks.email,
+                    url: links.email,
                   ),
                   _FooterIcon(
                     icon: Icons.description_rounded,
                     tooltip: "Resume",
-                    url: AppLinks.resume,
+                    url: links.resume,
                   ),
                 ],
               ),

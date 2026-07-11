@@ -14,6 +14,17 @@ class CertificateModel {
     required this.skills,
     required this.imageUrl,
   });
+
+  factory CertificateModel.fromJson(Map<String, dynamic> json) {
+    return CertificateModel(
+      title: json['title'] as String? ?? '',
+      organisation: json['organisation'] as String? ?? '',
+      date: json['date'] as String? ?? '',
+      link: json['link'] as String? ?? '',
+      skills: (json['skills'] as List?)?.whereType<String>().toList() ?? [],
+      imageUrl: json['imageUrl'] as String? ?? '',
+    );
+  }
 }
 
 final sampleCertificates = [

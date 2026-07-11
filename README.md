@@ -74,6 +74,14 @@ Personal Portfolio built using Flutter.
 - Added GlassNavBar widget to the project for a consistent navigation experience across the app.
 
 
+## Editing content (no redeploy needed)
+
+Projects, certificates, skills, reviews, hero text, and all links live in
+[`portfolio-data`](https://github.com/aravindpunyamantula/portfolio-data)
+(`data.json`). The site fetches it at runtime with a localStorage cache and
+a compiled-in fallback — edit that repo on GitHub and changes go live in
+~1–5 minutes. See its README for the full guide.
+
 ## Build & Deploy
 
 ```bash

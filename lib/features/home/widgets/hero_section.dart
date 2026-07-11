@@ -4,11 +4,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:portfolio/core/constants/app_colors.dart';
-import 'package:portfolio/core/constants/app_links.dart';
 import 'package:portfolio/core/utils/resposive.dart';
+import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/data/services/urls_launcher_service.dart';
 import 'package:portfolio/widgets/glass/glass_button.dart';
 import 'package:portfolio/widgets/glass/liquid_glass.dart';
+import 'package:provider/provider.dart';
 
 class HeroSection extends StatelessWidget {
   final VoidCallback tapProject;
@@ -21,6 +22,9 @@ class HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final content = context.watch<ContentService>().content;
+    final hero = content.hero;
+    final links = content.links;
     final isMobile = Responsive.isMobile(context);
     final screenSize = MediaQuery.of(context).size;
     final screenHeight = screenSize.height;
@@ -41,14 +45,16 @@ class HeroSection extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _AvailabilityBadge()
-                    .animate()
-                    .fadeIn(duration: 500.ms)
-                    .slideY(begin: 0.4, curve: Curves.easeOutCubic),
-                SizedBox(height: isMobile ? 28 : 36),
+                if (hero.showAvailability) ...[
+                  _AvailabilityBadge(text: hero.availability)
+                      .animate()
+                      .fadeIn(duration: 500.ms)
+                      .slideY(begin: 0.4, curve: Curves.easeOutCubic),
+                  SizedBox(height: isMobile ? 28 : 36),
+                ],
 
                 Text(
-                      "Hi, I'm",
+                      hero.greeting,
                       style: TextStyle(
                         fontSize: isMobile ? 18 : 22,
                         color: AppColors.textSecondary,
@@ -66,7 +72,7 @@ class HeroSection extends StatelessWidget {
                         stops: [0.0, 0.55, 1.0],
                       ).createShader(bounds),
                       child: Text(
-                        isMobile ? "Aravind Kumar" : "P. D. S. Aravind Kumar",
+                        isMobile ? hero.nameShort : hero.name,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: nameSize,
@@ -82,7 +88,7 @@ class HeroSection extends StatelessWidget {
                     .slideY(begin: 0.3, curve: Curves.easeOutCubic),
                 SizedBox(height: isMobile ? 16 : 20),
 
-                _RotatingRoles(isMobile: isMobile)
+                _RotatingRoles(isMobile: isMobile, roles: hero.roles)
                     .animate(delay: 500.ms)
                     .fadeIn(duration: 500.ms),
                 SizedBox(height: isMobile ? 20 : 24),
@@ -90,7 +96,7 @@ class HeroSection extends StatelessWidget {
                 ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 560),
                       child: Text(
-                        "I design and build scalable, high-performance applications with interfaces people love to use.",
+                        hero.tagline,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: isMobile ? 15 : 17,
@@ -138,25 +144,25 @@ class HeroSection extends StatelessWidget {
                         _SocialIcon(
                           icon: Icons.code_rounded,
                           tooltip: "GitHub",
-                          url: AppLinks.github,
+                          url: links.github,
                         ),
                         const SizedBox(width: 14),
                         _SocialIcon(
                           icon: Icons.business_center_rounded,
                           tooltip: "LinkedIn",
-                          url: AppLinks.linkedin,
+                          url: links.linkedin,
                         ),
                         const SizedBox(width: 14),
                         _SocialIcon(
                           icon: Icons.mail_rounded,
                           tooltip: "Email",
-                          url: AppLinks.email,
+                          url: links.email,
                         ),
                         const SizedBox(width: 14),
                         _SocialIcon(
                           icon: Icons.description_rounded,
                           tooltip: "Resume",
-                          url: AppLinks.resume,
+                          url: links.resume,
                         ),
                       ],
                     )
@@ -176,6 +182,9 @@ class HeroSection extends StatelessWidget {
 }
 
 class _AvailabilityBadge extends StatelessWidget {
+  final String text;
+  const _AvailabilityBadge({required this.text});
+
   @override
   Widget build(BuildContext context) {
     return LiquidGlass(
@@ -199,9 +208,9 @@ class _AvailabilityBadge extends StatelessWidget {
               .then()
               .fadeOut(duration: 900.ms),
           const SizedBox(width: 10),
-          const Text(
-            "Open to opportunities",
-            style: TextStyle(
+          Text(
+            text,
+            style: const TextStyle(
               color: Colors.white70,
               fontSize: 13,
               letterSpacing: 0.4,
@@ -215,20 +224,14 @@ class _AvailabilityBadge extends StatelessWidget {
 
 class _RotatingRoles extends StatefulWidget {
   final bool isMobile;
-  const _RotatingRoles({required this.isMobile});
+  final List<String> roles;
+  const _RotatingRoles({required this.isMobile, required this.roles});
 
   @override
   State<_RotatingRoles> createState() => _RotatingRolesState();
 }
 
 class _RotatingRolesState extends State<_RotatingRoles> {
-  static const roles = [
-    "Full Stack Developer",
-    "Flutter Developer",
-    "Backend Engineer",
-    "UI Craftsman",
-  ];
-
   int index = 0;
   Timer? timer;
 
@@ -236,7 +239,7 @@ class _RotatingRolesState extends State<_RotatingRoles> {
   void initState() {
     super.initState();
     timer = Timer.periodic(const Duration(milliseconds: 2600), (_) {
-      if (mounted) setState(() => index = (index + 1) % roles.length);
+      if (mounted) setState(() => index = index + 1);
     });
   }
 
@@ -268,7 +271,7 @@ class _RotatingRolesState extends State<_RotatingRoles> {
             );
           },
           child: Text(
-            roles[index],
+            widget.roles[index % widget.roles.length],
             key: ValueKey(index),
             style: TextStyle(
               fontSize: fontSize,

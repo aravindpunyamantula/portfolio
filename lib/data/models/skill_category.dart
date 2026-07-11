@@ -10,6 +10,23 @@ class SkillCategory {
     required this.skills,
     required this.color,
   });
+
+  factory SkillCategory.fromJson(Map<String, dynamic> json) {
+    return SkillCategory(
+      title: json['title'] as String? ?? '',
+      skills: (json['skills'] as List?)?.whereType<String>().toList() ?? [],
+      color: _parseHex(json['color'] as String?) ?? const Color(0xFF6366F1),
+    );
+  }
+
+  /// Parses "#RRGGBB" (or "RRGGBB") to an opaque [Color].
+  static Color? _parseHex(String? hex) {
+    if (hex == null) return null;
+    final cleaned = hex.replaceFirst('#', '');
+    if (cleaned.length != 6) return null;
+    final value = int.tryParse(cleaned, radix: 16);
+    return value == null ? null : Color(0xFF000000 | value);
+  }
 }
 
 final sampleSkills = [

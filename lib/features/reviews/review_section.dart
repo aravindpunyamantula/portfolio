@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:portfolio/core/utils/resposive.dart';
 import 'package:portfolio/data/services/content_service.dart';
-import 'package:portfolio/features/certificates/widgets/certificate_card.dart';
+import 'package:portfolio/features/reviews/widgets/review_card.dart';
 import 'package:portfolio/widgets/common/section_container.dart';
 import 'package:portfolio/widgets/common/section_header.dart';
 import 'package:portfolio/widgets/glass/glass_arrow_button.dart';
 import 'package:provider/provider.dart';
 
-class CertificateSection extends StatefulWidget {
-  const CertificateSection({super.key});
+/// Client / peer testimonials, fed entirely from data.json — the whole
+/// section stays hidden until at least one review exists.
+class ReviewSection extends StatefulWidget {
+  const ReviewSection({super.key});
 
   @override
-  State<CertificateSection> createState() => _CertificateSectionState();
+  State<ReviewSection> createState() => _ReviewSectionState();
 }
 
-class _CertificateSectionState extends State<CertificateSection> {
+class _ReviewSectionState extends State<ReviewSection> {
   final ScrollController _scrollCtrl = ScrollController();
 
   @override
@@ -39,8 +41,10 @@ class _CertificateSectionState extends State<CertificateSection> {
   @override
   Widget build(BuildContext context) {
     final content = context.watch<ContentService>().content;
-    final certificates = content.certificates;
-    final header = content.section('certificates');
+    final reviews = content.reviews;
+    if (reviews.isEmpty) return const SizedBox.shrink();
+
+    final header = content.section('reviews');
     final isMobile = Responsive.isMobile(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = isMobile
@@ -58,20 +62,16 @@ class _CertificateSectionState extends State<CertificateSection> {
           ),
           const SizedBox(height: 28),
           SizedBox(
-            height: 380,
+            height: 290,
             child: ListView.builder(
               controller: _scrollCtrl,
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-              itemCount: certificates.length,
+              itemCount: reviews.length,
               itemBuilder: (context, index) {
-                final certificate = certificates[index];
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: CertificateCard(
-                        certificate: certificate,
-                        width: cardWidth,
-                      )
+                  child: ReviewCard(review: reviews[index], width: cardWidth)
                       .animate()
                       .fadeIn(duration: 600.ms, delay: (index * 150).ms)
                       .moveY(
@@ -84,30 +84,32 @@ class _CertificateSectionState extends State<CertificateSection> {
               },
             ),
           ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GlassArrowButton(
-                icon: Icons.arrow_back_rounded,
-                onTap: () => _scrollBy(-step),
-              ),
-              const SizedBox(width: 16),
-              const Text(
-                "Scroll",
-                style: TextStyle(
-                  color: Colors.white30,
-                  fontSize: 12,
-                  letterSpacing: 2,
+          if (reviews.length > (isMobile ? 1 : 3)) ...[
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GlassArrowButton(
+                  icon: Icons.arrow_back_rounded,
+                  onTap: () => _scrollBy(-step),
                 ),
-              ),
-              const SizedBox(width: 16),
-              GlassArrowButton(
-                icon: Icons.arrow_forward_rounded,
-                onTap: () => _scrollBy(step),
-              ),
-            ],
-          ),
+                const SizedBox(width: 16),
+                const Text(
+                  "Scroll",
+                  style: TextStyle(
+                    color: Colors.white30,
+                    fontSize: 12,
+                    letterSpacing: 2,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                GlassArrowButton(
+                  icon: Icons.arrow_forward_rounded,
+                  onTap: () => _scrollBy(step),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

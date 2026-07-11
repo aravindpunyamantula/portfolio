@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:portfolio/data/models/skill_category.dart';
+import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/features/skills/widgets/skill_category_widget.dart';
 import 'package:portfolio/widgets/common/section_container.dart';
 import 'package:portfolio/widgets/common/section_header.dart';
+import 'package:provider/provider.dart';
 
 class SkillSection extends StatelessWidget {
   /// Page scroll offset — drives the 3D orbit rotation of each planet.
@@ -13,21 +14,24 @@ class SkillSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final content = context.watch<ContentService>().content;
+    final categories = content.skillCategories;
+    final header = content.section('skills');
+
     return SectionContainer(
       child: Column(
         children: [
-          const SectionHeader(
-            eyebrow: "EXPERTISE",
-            title: "Tech Universe",
-            subtitle:
-                "Technologies powering scalable systems, immersive interfaces, and modern digital products — each one in orbit.",
+          SectionHeader(
+            eyebrow: header.eyebrow,
+            title: header.title,
+            subtitle: header.subtitle,
           ),
           const SizedBox(height: 24),
-          ...List.generate(sampleSkills.length, (index) {
+          ...List.generate(categories.length, (index) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: SkillCategoryWidget(
-                category: sampleSkills[index],
+                category: categories[index],
                 scrollOffset: scrollOffset,
                 alignment: index.isEven
                     ? const Alignment(-0.6, 0)

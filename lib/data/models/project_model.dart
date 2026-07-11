@@ -13,6 +13,16 @@ class ProjectModel {
     this.githubLink,
   });
 
+  factory ProjectModel.fromJson(Map<String, dynamic> json) {
+    return ProjectModel(
+      projectTitle: json['title'] as String? ?? '',
+      projectDescription: json['description'] as String? ?? '',
+      projectImageUrl: json['imageUrl'] as String? ?? '',
+      projectLink: json['liveUrl'] as String? ?? '',
+      githubLink: json['githubUrl'] as String? ?? '',
+    );
+  }
+
   ProjectPreviewType get previewType {
     if (projectLink != null && projectLink!.isNotEmpty) {
       return ProjectPreviewType.live;

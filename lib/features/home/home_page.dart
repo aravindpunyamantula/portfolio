@@ -1,14 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:portfolio/core/constants/app_colors.dart';
-import 'package:portfolio/core/constants/app_links.dart';
 import 'package:portfolio/core/constants/app_spacing.dart';
+import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/data/services/urls_launcher_service.dart';
 import 'package:portfolio/features/certificates/certificate_section.dart';
 import 'package:portfolio/features/contacts/contact_section.dart';
 import 'package:portfolio/features/home/widgets/hero_section.dart';
 import 'package:portfolio/features/projects/project_section.dart';
+import 'package:portfolio/features/reviews/review_section.dart';
 import 'package:portfolio/features/skills/skill_section.dart';
+import 'package:provider/provider.dart';
 import 'package:portfolio/widgets/common/app_footer.dart';
 import 'package:portfolio/widgets/common/space_background.dart';
 import 'package:portfolio/widgets/glass/glass_nav_bar.dart';
@@ -26,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey projectsKey = GlobalKey();
   final GlobalKey skillsKey = GlobalKey();
   final GlobalKey certificatesKey = GlobalKey();
+  final GlobalKey reviewsKey = GlobalKey();
   final GlobalKey contactKey = GlobalKey();
 
   final ScrollController _scrollCtrl = ScrollController();
@@ -128,6 +131,8 @@ class _HomePageState extends State<HomePage> {
                     child: const CertificateSection(),
                   ),
                   SizedBox(height: AppSpacing.md),
+                  Container(key: reviewsKey, child: const ReviewSection()),
+                  SizedBox(height: AppSpacing.md),
                   Container(key: contactKey, child: const ContactSection()),
                   const SizedBox(height: 40),
                   const AppFooter(),
@@ -149,6 +154,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Drawer _buildDrawer(BuildContext context) {
+    final links = context.read<ContentService>().content.links;
     final sections = [
       (Icons.home_rounded, "Home", homeKey),
       (Icons.work_rounded, "Projects", projectsKey),
@@ -242,20 +248,20 @@ class _HomePageState extends State<HomePage> {
                           height: 32,
                         ),
                         Row(
-                          children: const [
+                          children: [
                             _DrawerSocialIcon(
                               icon: Icons.code_rounded,
-                              url: AppLinks.github,
+                              url: links.github,
                             ),
-                            SizedBox(width: 12),
+                            const SizedBox(width: 12),
                             _DrawerSocialIcon(
                               icon: Icons.business_center_rounded,
-                              url: AppLinks.linkedin,
+                              url: links.linkedin,
                             ),
-                            SizedBox(width: 12),
+                            const SizedBox(width: 12),
                             _DrawerSocialIcon(
                               icon: Icons.mail_rounded,
-                              url: AppLinks.email,
+                              url: links.email,
                             ),
                           ],
                         ),
