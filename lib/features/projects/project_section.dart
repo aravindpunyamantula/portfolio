@@ -33,8 +33,13 @@ class _ProjectSectionState extends State<ProjectSection> {
     super.didChangeDependencies();
     if (_pageCtrl == null || _fraction != _targetFraction) {
       _fraction = _targetFraction;
-      _pageCtrl?.dispose();
+      final old = _pageCtrl;
       _pageCtrl = PageController(viewportFraction: _fraction);
+      // The old controller is still attached to the PageView until this
+      // build pass swaps it in — disposing it now would trip debug asserts.
+      if (old != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => old.dispose());
+      }
     }
   }
 
@@ -72,29 +77,34 @@ class _ProjectSectionState extends State<ProjectSection> {
           const SizedBox(height: 28),
           SizedBox(
             height: isMobile ? 400 : 540,
-            child: AnimatedBuilder(
-              animation: ctrl,
-              builder: (context, _) {
-                final currentPage = ctrl.hasClients ? (ctrl.page ?? 0) : 0.0;
-                return PageView.builder(
-                  padEnds: false,
-                  controller: ctrl,
-                  itemCount: projects.length,
-                  itemBuilder: (context, index) {
-                    final project = projects[index];
+            // The controller listeners must live BELOW the PageView: when a
+            // breakpoint change swaps in a new controller, its attach fires
+            // a notification mid-build, and notifying an ancestor throws
+            // "setState() called during build". Descendants are fine.
+            child: PageView.builder(
+              padEnds: false,
+              controller: ctrl,
+              itemCount: projects.length,
+              itemBuilder: (context, index) {
+                final project = projects[index];
+                return AnimatedBuilder(
+                  animation: ctrl,
+                  child: Padding(
+                    padding: EdgeInsets.only(right: isMobile ? 8 : 24),
+                    child: ProjectCard(project: project, isMobile: isMobile),
+                  ),
+                  builder: (context, child) {
+                    final currentPage =
+                        ctrl.hasClients && ctrl.position.haveDimensions
+                            ? (ctrl.page ?? 0)
+                            : 0.0;
                     final scale = isMobile
                         ? 1.0
                         : (1 - (currentPage - index).abs() * 0.15).clamp(
                             0.85,
                             1.0,
                           );
-                    return Padding(
-                      padding: EdgeInsets.only(right: isMobile ? 8 : 24),
-                      child: Transform.scale(
-                        scale: scale,
-                        child: ProjectCard(project: project, isMobile: isMobile),
-                      ),
-                    );
+                    return Transform.scale(scale: scale, child: child);
                   },
                 );
               },
@@ -112,7 +122,10 @@ class _ProjectSectionState extends State<ProjectSection> {
               AnimatedBuilder(
                 animation: ctrl,
                 builder: (context, _) {
-                  final current = ctrl.hasClients ? (ctrl.page ?? 0) : 0.0;
+                  final current =
+                      ctrl.hasClients && ctrl.position.haveDimensions
+                          ? (ctrl.page ?? 0)
+                          : 0.0;
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: List.generate(projects.length, (index) {
