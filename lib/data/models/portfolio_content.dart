@@ -155,6 +155,10 @@ class HeroContent {
   final bool showAvailability;
   final String footerTagline;
 
+  /// Short "what I'm working on right now" line for the hero ticker.
+  /// Empty string hides the chip.
+  final String currentlyBuilding;
+
   HeroContent({
     required this.greeting,
     required this.name,
@@ -164,6 +168,7 @@ class HeroContent {
     required this.availability,
     required this.showAvailability,
     required this.footerTagline,
+    this.currentlyBuilding = '',
   });
 
   factory HeroContent.fallback() {
@@ -197,6 +202,8 @@ class HeroContent {
       availability: json['availability'] as String? ?? def.availability,
       showAvailability: json['showAvailability'] as bool? ?? def.showAvailability,
       footerTagline: json['footerTagline'] as String? ?? def.footerTagline,
+      currentlyBuilding:
+          json['currentlyBuilding'] as String? ?? def.currentlyBuilding,
     );
   }
 }
