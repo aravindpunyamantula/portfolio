@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portfolio/core/constants/app_colors.dart';
 import 'package:portfolio/core/utils/resposive.dart';
 import 'package:portfolio/data/services/content_service.dart';
@@ -142,25 +143,25 @@ class HeroSection extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _SocialIcon(
-                          icon: Icons.code_rounded,
+                          icon: FontAwesomeIcons.github,
                           tooltip: "GitHub",
                           url: links.github,
                         ),
                         const SizedBox(width: 14),
                         _SocialIcon(
-                          icon: Icons.business_center_rounded,
+                          icon: FontAwesomeIcons.linkedinIn,
                           tooltip: "LinkedIn",
                           url: links.linkedin,
                         ),
                         const SizedBox(width: 14),
                         _SocialIcon(
-                          icon: Icons.mail_rounded,
+                          icon: FontAwesomeIcons.solidEnvelope,
                           tooltip: "Email",
                           url: links.email,
                         ),
                         const SizedBox(width: 14),
                         _SocialIcon(
-                          icon: Icons.description_rounded,
+                          icon: FontAwesomeIcons.solidFileLines,
                           tooltip: "Resume",
                           url: links.resume,
                         ),
@@ -287,7 +288,7 @@ class _RotatingRolesState extends State<_RotatingRoles> {
 }
 
 class _SocialIcon extends StatelessWidget {
-  final IconData icon;
+  final FaIconData icon;
   final String tooltip;
   final String url;
 
@@ -312,9 +313,9 @@ class _SocialIcon extends StatelessWidget {
               shadow: false,
               glow: hovering ? 1 : 0,
               padding: const EdgeInsets.all(12),
-              child: Icon(
+              child: FaIcon(
                 icon,
-                size: 20,
+                size: 18,
                 color: hovering ? Colors.white : Colors.white70,
               ),
             ),

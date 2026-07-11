@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portfolio/core/constants/app_colors.dart';
 import 'package:portfolio/core/constants/app_spacing.dart';
 import 'package:portfolio/data/services/content_service.dart';
@@ -250,17 +251,17 @@ class _HomePageState extends State<HomePage> {
                         Row(
                           children: [
                             _DrawerSocialIcon(
-                              icon: Icons.code_rounded,
+                              icon: FontAwesomeIcons.github,
                               url: links.github,
                             ),
                             const SizedBox(width: 12),
                             _DrawerSocialIcon(
-                              icon: Icons.business_center_rounded,
+                              icon: FontAwesomeIcons.linkedinIn,
                               url: links.linkedin,
                             ),
                             const SizedBox(width: 12),
                             _DrawerSocialIcon(
-                              icon: Icons.mail_rounded,
+                              icon: FontAwesomeIcons.solidEnvelope,
                               url: links.email,
                             ),
                           ],
@@ -348,7 +349,7 @@ class _DrawerItem extends StatelessWidget {
 }
 
 class _DrawerSocialIcon extends StatelessWidget {
-  final IconData icon;
+  final FaIconData icon;
   final String url;
 
   const _DrawerSocialIcon({required this.icon, required this.url});
@@ -364,7 +365,7 @@ class _DrawerSocialIcon extends StatelessWidget {
           color: Colors.white.withOpacity(0.06),
           border: Border.all(color: Colors.white.withOpacity(0.12)),
         ),
-        child: Icon(icon, size: 18, color: Colors.white70),
+        child: FaIcon(icon, size: 16, color: Colors.white70),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portfolio/core/constants/app_colors.dart';
 import 'package:portfolio/core/utils/resposive.dart';
 import 'package:portfolio/data/models/portfolio_content.dart';
@@ -118,22 +119,22 @@ class _ContactSectionState extends State<ContactSection> {
                 alignment: WrapAlignment.center,
                 children: [
                   _SocialPill(
-                    icon: Icons.code_rounded,
+                    icon: FontAwesomeIcons.github,
                     label: "GitHub",
                     url: links.github,
                   ),
                   _SocialPill(
-                    icon: Icons.business_center_rounded,
+                    icon: FontAwesomeIcons.linkedinIn,
                     label: "LinkedIn",
                     url: links.linkedin,
                   ),
                   _SocialPill(
-                    icon: Icons.camera_alt_rounded,
+                    icon: FontAwesomeIcons.instagram,
                     label: "Instagram",
                     url: links.instagram,
                   ),
                   _SocialPill(
-                    icon: Icons.mail_rounded,
+                    icon: FontAwesomeIcons.solidEnvelope,
                     label: "Email",
                     url: links.email,
                   ),
@@ -391,7 +392,7 @@ class _QuickActionPillState extends State<_QuickActionPill> {
 }
 
 class _SocialPill extends StatefulWidget {
-  final IconData icon;
+  final FaIconData icon;
   final String label;
   final String url;
 
@@ -425,10 +426,10 @@ class _SocialPillState extends State<_SocialPill> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
+              FaIcon(
                 widget.icon,
                 color: hovering ? Colors.white : Colors.white70,
-                size: 18,
+                size: 16,
               ),
               const SizedBox(width: 10),
               Text(

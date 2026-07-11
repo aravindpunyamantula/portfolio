@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portfolio/core/constants/app_colors.dart';
 import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/data/services/urls_launcher_service.dart';
@@ -68,27 +69,27 @@ class AppFooter extends StatelessWidget {
                 alignment: WrapAlignment.center,
                 children: [
                   _FooterIcon(
-                    icon: Icons.code_rounded,
+                    icon: FontAwesomeIcons.github,
                     tooltip: "GitHub",
                     url: links.github,
                   ),
                   _FooterIcon(
-                    icon: Icons.business_center_rounded,
+                    icon: FontAwesomeIcons.linkedinIn,
                     tooltip: "LinkedIn",
                     url: links.linkedin,
                   ),
                   _FooterIcon(
-                    icon: Icons.camera_alt_rounded,
+                    icon: FontAwesomeIcons.instagram,
                     tooltip: "Instagram",
                     url: links.instagram,
                   ),
                   _FooterIcon(
-                    icon: Icons.mail_rounded,
+                    icon: FontAwesomeIcons.solidEnvelope,
                     tooltip: "Email",
                     url: links.email,
                   ),
                   _FooterIcon(
-                    icon: Icons.description_rounded,
+                    icon: FontAwesomeIcons.solidFileLines,
                     tooltip: "Resume",
                     url: links.resume,
                   ),
@@ -143,7 +144,7 @@ class AppFooter extends StatelessWidget {
 }
 
 class _FooterIcon extends StatelessWidget {
-  final IconData icon;
+  final FaIconData icon;
   final String tooltip;
   final String url;
 
@@ -168,9 +169,9 @@ class _FooterIcon extends StatelessWidget {
               shadow: false,
               glow: hovering ? 1 : 0,
               padding: const EdgeInsets.all(11),
-              child: Icon(
+              child: FaIcon(
                 icon,
-                size: 18,
+                size: 16,
                 color: hovering ? Colors.white : Colors.white60,
               ),
             ),
