@@ -74,6 +74,23 @@ Personal Portfolio built using Flutter.
 - Added GlassNavBar widget to the project for a consistent navigation experience across the app.
 
 
+## TODO (Aravind)
+
+- [ ] Upload `images/certs/oracle-database.png` and
+      `images/certs/java-programming.png` to the
+      [portfolio-data](https://github.com/aravindpunyamantula/portfolio-data)
+      repo — the old LinkedIn image URLs expired and those two weren't
+      recoverable. `data.json` already points at these paths, so uploading
+      the files is all it takes.
+- [ ] Optionally upload the resume PDF to `portfolio-data/resume/` and point
+      `links.resume` in `data.json` at its jsDelivr URL (currently still
+      Google Drive).
+- [ ] Deploy: connect this repo in Cloudflare Pages — build command
+      `flutter build web --release --wasm`, output directory `build/web` —
+      add `aravindkumar.tech` under Custom domains, then run
+      [PageSpeed Insights](https://pagespeed.web.dev) on the live URL.
+- [ ] Replace the dummy review in `portfolio-data/data.json` with a real one.
+
 ## Editing content (no redeploy needed)
 
 Projects, certificates, skills, reviews, hero text, and all links live in

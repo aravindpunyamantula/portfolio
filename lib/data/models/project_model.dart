@@ -5,12 +5,16 @@ class ProjectModel {
   String? projectLink = "";
   String? githubLink = "";
 
+  /// Display position — lower shows first. Ties keep data.json order.
+  final int order;
+
   ProjectModel({
     required this.projectTitle,
     required this.projectDescription,
     this.projectImageUrl,
     this.projectLink,
     this.githubLink,
+    this.order = 9999,
   });
 
   factory ProjectModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +24,7 @@ class ProjectModel {
       projectImageUrl: json['imageUrl'] as String? ?? '',
       projectLink: json['liveUrl'] as String? ?? '',
       githubLink: json['githubUrl'] as String? ?? '',
+      order: (json['order'] as num?)?.toInt() ?? 9999,
     );
   }
 

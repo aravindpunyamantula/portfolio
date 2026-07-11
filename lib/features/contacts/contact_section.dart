@@ -8,6 +8,7 @@ import 'package:portfolio/data/services/urls_launcher_service.dart';
 import 'package:portfolio/widgets/common/section_container.dart';
 import 'package:portfolio/widgets/common/section_header.dart';
 import 'package:portfolio/widgets/glass/glass_button.dart';
+import 'package:portfolio/widgets/glass/glass_snackbar.dart';
 import 'package:portfolio/widgets/glass/liquid_glass.dart';
 import 'package:provider/provider.dart';
 
@@ -52,31 +53,11 @@ class _ContactSectionState extends State<ContactSection> {
       final what = emailError && email.isNotEmpty
           ? "Please enter a valid email address"
           : "Please fill in all fields before sending";
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: const Color(0xFF1A1F2E),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-            side: BorderSide(color: Colors.redAccent.withOpacity(0.4)),
-          ),
-          content: Row(
-            children: [
-              const Icon(
-                Icons.error_outline_rounded,
-                color: Colors.redAccent,
-                size: 18,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  what,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        ),
+      showGlassSnackBar(
+        context,
+        message: what,
+        icon: Icons.error_outline_rounded,
+        accent: Colors.redAccent,
       );
       return;
     }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:portfolio/widgets/glass/glass_snackbar.dart';
 
 class EmailService extends ChangeNotifier {
   bool sent = false;
@@ -13,7 +14,6 @@ class EmailService extends ChangeNotifier {
     String email,
     String message,
   ) async {
-    print("Sending email from $name <$email>: $message");
     sent = true;
     notifyListeners();
 
@@ -47,19 +47,31 @@ class EmailService extends ChangeNotifier {
         }),
       );
 
+      if (!context.mounted) return;
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Message Sent Successfully")),
+        showGlassSnackBar(
+          context,
+          message: "Message sent — I'll get back to you soon!",
+          icon: Icons.mark_email_read_rounded,
+          accent: const Color(0xFF34D399),
         );
       } else {
-        ScaffoldMessenger.of(
+        showGlassSnackBar(
           context,
-        ).showSnackBar(const SnackBar(content: Text("Failed to send message")));
+          message: "Failed to send — please try again or email me directly.",
+          icon: Icons.error_outline_rounded,
+          accent: Colors.redAccent,
+        );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to send message ${e.toString()}")),
-      );
+      if (context.mounted) {
+        showGlassSnackBar(
+          context,
+          message: "Failed to send — please try again or email me directly.",
+          icon: Icons.error_outline_rounded,
+          accent: Colors.redAccent,
+        );
+      }
     } finally {
       sent = false;
       notifyListeners();

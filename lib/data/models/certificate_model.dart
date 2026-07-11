@@ -6,6 +6,9 @@ class CertificateModel {
   final List<String> skills;
   final String imageUrl;
 
+  /// Display position — lower shows first. Ties keep data.json order.
+  final int order;
+
   CertificateModel({
     required this.title,
     required this.organisation,
@@ -13,6 +16,7 @@ class CertificateModel {
     required this.link,
     required this.skills,
     required this.imageUrl,
+    this.order = 9999,
   });
 
   factory CertificateModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +27,7 @@ class CertificateModel {
       link: json['link'] as String? ?? '',
       skills: (json['skills'] as List?)?.whereType<String>().toList() ?? [],
       imageUrl: json['imageUrl'] as String? ?? '',
+      order: (json['order'] as num?)?.toInt() ?? 9999,
     );
   }
 }

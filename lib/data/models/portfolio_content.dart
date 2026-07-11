@@ -73,6 +73,17 @@ class PortfolioContent {
       }
     }
 
+    // Stable sort on the `order` field — ties keep their data.json order
+    // (List.sort alone isn't stable).
+    List<T> sortByOrder<T>(List<T> list, int Function(T) orderOf) {
+      final indexed = list.asMap().entries.toList()
+        ..sort((a, b) {
+          final byOrder = orderOf(a.value).compareTo(orderOf(b.value));
+          return byOrder != 0 ? byOrder : a.key.compareTo(b.key);
+        });
+      return indexed.map((e) => e.value).toList();
+    }
+
     return PortfolioContent(
       hero: json['hero'] is Map
           ? HeroContent.fromJson(
@@ -82,10 +93,13 @@ class PortfolioContent {
           ? LinksContent.fromJson(
               Map<String, dynamic>.from(json['links'] as Map), fallback.links)
           : fallback.links,
-      projects:
+      projects: sortByOrder(
           parseList('projects', ProjectModel.fromJson, fallback.projects),
-      certificates: parseList(
-          'certificates', CertificateModel.fromJson, fallback.certificates),
+          (p) => p.order),
+      certificates: sortByOrder(
+          parseList(
+              'certificates', CertificateModel.fromJson, fallback.certificates),
+          (c) => c.order),
       skillCategories: parseList(
           'skillCategories', SkillCategory.fromJson, fallback.skillCategories),
       reviews: parseList('reviews', ReviewModel.fromJson, fallback.reviews,
