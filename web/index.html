@@ -70,6 +70,10 @@
       background: #0B0F19;
       height: 100%;
       overflow: hidden;
+      /* Stop trackpad horizontal swipes / edge drags from triggering the
+         browser's back-forward navigation gesture, and rubber-band pulls
+         from refreshing on mobile. */
+      overscroll-behavior: none;
     }
     /* The splash mirrors the Flutter hero in plain HTML/CSS, so the
        browser paints real content in the first frames — this is what

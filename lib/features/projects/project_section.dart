@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:portfolio/core/utils/resposive.dart';
 import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/features/projects/widgets/project_card.dart';
+import 'package:portfolio/widgets/common/carousel_cta_card.dart';
 import 'package:portfolio/widgets/common/section_container.dart';
 import 'package:portfolio/widgets/common/section_header.dart';
 import 'package:portfolio/widgets/glass/glass_arrow_button.dart';
 import 'package:provider/provider.dart';
 
 class ProjectSection extends StatefulWidget {
-  const ProjectSection({super.key});
+  final VoidCallback? tapContact;
+  const ProjectSection({super.key, this.tapContact});
 
   @override
   State<ProjectSection> createState() => _ProjectSectionState();
@@ -50,7 +52,8 @@ class _ProjectSectionState extends State<ProjectSection> {
   }
 
   void _goTo(int delta) {
-    final count = context.read<ContentService>().content.projects.length;
+    // +1 for the closing "contact me" card.
+    final count = context.read<ContentService>().content.projects.length + 1;
     final page = (_pageCtrl!.page ?? 0).round() + delta;
     _pageCtrl!.animateToPage(
       page.clamp(0, count - 1),
@@ -84,14 +87,25 @@ class _ProjectSectionState extends State<ProjectSection> {
             child: PageView.builder(
               padEnds: false,
               controller: ctrl,
-              itemCount: projects.length,
+              itemCount: projects.length + 1,
               itemBuilder: (context, index) {
-                final project = projects[index];
+                final isCta = index == projects.length;
                 return AnimatedBuilder(
                   animation: ctrl,
                   child: Padding(
                     padding: EdgeInsets.only(right: isMobile ? 8 : 24),
-                    child: ProjectCard(project: project, isMobile: isMobile),
+                    child: isCta
+                        ? Center(
+                            child: CarouselCtaCard(
+                              title: "Interested in my projects?",
+                              subtitle:
+                                  "I thought so. Let's build something exceptional together — I reply fast.",
+                              onContact: widget.tapContact ?? () {},
+                              width: isMobile ? 300 : 420,
+                            ),
+                          )
+                        : ProjectCard(
+                            project: projects[index], isMobile: isMobile),
                   ),
                   builder: (context, child) {
                     final currentPage =
@@ -128,7 +142,7 @@ class _ProjectSectionState extends State<ProjectSection> {
                           : 0.0;
                   return Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: List.generate(projects.length, (index) {
+                    children: List.generate(projects.length + 1, (index) {
                       final isActive = current.round() == index;
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 300),

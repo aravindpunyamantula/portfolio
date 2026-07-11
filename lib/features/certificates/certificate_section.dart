@@ -3,13 +3,15 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:portfolio/core/utils/resposive.dart';
 import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/features/certificates/widgets/certificate_card.dart';
+import 'package:portfolio/widgets/common/carousel_cta_card.dart';
 import 'package:portfolio/widgets/common/section_container.dart';
 import 'package:portfolio/widgets/common/section_header.dart';
 import 'package:portfolio/widgets/glass/glass_arrow_button.dart';
 import 'package:provider/provider.dart';
 
 class CertificateSection extends StatefulWidget {
-  const CertificateSection({super.key});
+  final VoidCallback? tapContact;
+  const CertificateSection({super.key, this.tapContact});
 
   @override
   State<CertificateSection> createState() => _CertificateSectionState();
@@ -63,15 +65,26 @@ class _CertificateSectionState extends State<CertificateSection> {
               controller: _scrollCtrl,
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-              itemCount: certificates.length,
+              itemCount: certificates.length + 1,
               itemBuilder: (context, index) {
-                final certificate = certificates[index];
+                final isCta = index == certificates.length;
+                final card = isCta
+                    ? SizedBox(
+                        width: cardWidth,
+                        child: CarouselCtaCard(
+                          title: "Interested in my certifications?",
+                          subtitle:
+                              "The skills behind these badges are for hire. Let's talk about what I can build for you.",
+                          onContact: widget.tapContact ?? () {},
+                        ),
+                      )
+                    : CertificateCard(
+                        certificate: certificates[index],
+                        width: cardWidth,
+                      );
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: CertificateCard(
-                        certificate: certificate,
-                        width: cardWidth,
-                      )
+                  child: card
                       .animate()
                       .fadeIn(duration: 600.ms, delay: (index * 150).ms)
                       .moveY(

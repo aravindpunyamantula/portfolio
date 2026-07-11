@@ -65,7 +65,10 @@ class _HomePageState extends State<HomePage> {
     _showToTop.value = offset > 600;
 
     var active = 0;
-    for (final entry in [projectsKey, skillsKey, contactKey].asMap().entries) {
+    for (final entry
+        in [projectsKey, skillsKey, certificatesKey, contactKey]
+            .asMap()
+            .entries) {
       final ctx = entry.value.currentContext;
       if (ctx == null) continue;
       final box = ctx.findRenderObject() as RenderBox?;
@@ -120,7 +123,12 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(height: AppSpacing.md),
-                  Container(key: projectsKey, child: const ProjectSection()),
+                  Container(
+                    key: projectsKey,
+                    child: ProjectSection(
+                      tapContact: () => scrollToSection(contactKey),
+                    ),
+                  ),
                   SizedBox(height: AppSpacing.md),
                   Container(
                     key: skillsKey,
@@ -129,7 +137,9 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(height: AppSpacing.md),
                   Container(
                     key: certificatesKey,
-                    child: const CertificateSection(),
+                    child: CertificateSection(
+                      tapContact: () => scrollToSection(contactKey),
+                    ),
                   ),
                   SizedBox(height: AppSpacing.md),
                   Container(key: reviewsKey, child: const ReviewSection()),
@@ -145,6 +155,7 @@ class _HomePageState extends State<HomePage> {
               onHomeTap: () => scrollToSection(homeKey),
               onProjectsTap: () => scrollToSection(projectsKey),
               onSkillsTap: () => scrollToSection(skillsKey),
+              onCertificatesTap: () => scrollToSection(certificatesKey),
               onContactTap: () => scrollToSection(contactKey),
             ),
             _ScrollToTopButton(visible: _showToTop, onTap: _scrollToTop),
@@ -160,6 +171,7 @@ class _HomePageState extends State<HomePage> {
       (Icons.home_rounded, "Home", homeKey),
       (Icons.work_rounded, "Projects", projectsKey),
       (Icons.public_rounded, "Skills", skillsKey),
+      (Icons.verified_rounded, "Certifications", certificatesKey),
       (Icons.mail_rounded, "Contact", contactKey),
     ];
 

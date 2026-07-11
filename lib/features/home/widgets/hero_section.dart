@@ -98,12 +98,14 @@ class _HeroSectionState extends State<HeroSection> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (hero.showAvailability) ...[
-          _AvailabilityBadge(
-            text: hero.availability,
-            // Easter egg: double-tap collapses the starfield into a
-            // black hole, then warps down to the contact section.
-            onDoubleTap: () =>
-                _field.blackHole(onComplete: widget.tapContact),
+          RepaintBoundary(
+            child: _AvailabilityBadge(
+              text: hero.availability,
+              // Easter egg: double-tap collapses the starfield into a
+              // black hole, then warps down to the contact section.
+              onDoubleTap: () =>
+                  _field.blackHole(onComplete: widget.tapContact),
+            ),
           ).animate().fadeIn(duration: 500.ms).slideY(
               begin: 0.4, curve: Curves.easeOutCubic),
           SizedBox(height: isMobile ? 28 : 36),
@@ -130,7 +132,7 @@ class _HeroSectionState extends State<HeroSection> {
         ).animate(delay: 250.ms).fadeIn(duration: 400.ms),
         SizedBox(height: isMobile ? 16 : 20),
 
-        _TypingRole(roles: hero.roles, isMobile: isMobile)
+        RepaintBoundary(child: _TypingRole(roles: hero.roles, isMobile: isMobile))
             .animate(delay: 500.ms)
             .fadeIn(duration: 500.ms),
         SizedBox(height: isMobile ? 20 : 24),
@@ -219,24 +221,28 @@ class _HeroSectionState extends State<HeroSection> {
         const SizedBox(height: 22),
 
         // Live proof-of-work: GitHub stats + "currently building" ticker.
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            _GithubChips(future: _statsFuture),
-            if (hero.currentlyBuilding.isNotEmpty)
-              _InfoChip(
-                dotColor: const Color(0xFFF59E0B),
-                pulse: true,
-                text: "Building: ${hero.currentlyBuilding}",
-              ),
-          ],
+        RepaintBoundary(
+          child: Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              _GithubChips(future: _statsFuture),
+              if (hero.currentlyBuilding.isNotEmpty)
+                _InfoChip(
+                  dotColor: const Color(0xFFF59E0B),
+                  pulse: true,
+                  text: "Building: ${hero.currentlyBuilding}",
+                ),
+            ],
+          ),
         ).animate(delay: 1150.ms).fadeIn(duration: 500.ms),
         SizedBox(height: isMobile ? 34 : 44),
 
-        const _ScrollIndicator().animate(delay: 1400.ms).fadeIn(),
+        const RepaintBoundary(child: _ScrollIndicator())
+            .animate(delay: 1400.ms)
+            .fadeIn(),
       ],
     );
 
@@ -435,6 +441,8 @@ class _TypingRoleState extends State<_TypingRole> {
   int _chars = 0;
   bool _deleting = false;
   Timer? _timer;
+  double _maxWidth = 0;
+  double _measuredFor = -1;
 
   @override
   void initState() {
@@ -474,26 +482,43 @@ class _TypingRoleState extends State<_TypingRole> {
     super.dispose();
   }
 
+  TextStyle _style(double fontSize) => TextStyle(
+        fontSize: fontSize,
+        fontWeight: FontWeight.w600,
+        color: AppColors.primary.withOpacity(0.95),
+        letterSpacing: 0.5,
+      );
+
   @override
   Widget build(BuildContext context) {
     final fontSize = widget.isMobile ? 18.0 : 24.0;
     final word = widget.roles[_role % widget.roles.length];
     final shown = word.substring(0, _chars.clamp(0, word.length));
 
+    // The box must keep a constant size while the text types: a size
+    // change every tick would dirty the whole hero's layout and force a
+    // full repaint of every glass surface, 16 times per second.
+    if (_measuredFor != fontSize) {
+      _measuredFor = fontSize;
+      _maxWidth = 0;
+      for (final role in widget.roles) {
+        final painter = TextPainter(
+          text: TextSpan(text: role, style: _style(fontSize)),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        _maxWidth = max(_maxWidth, painter.width);
+      }
+      _maxWidth += fontSize * 0.6; // room for the cursor
+    }
+
     return SizedBox(
+      width: _maxWidth,
       height: fontSize * 1.6,
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            shown,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w600,
-              color: AppColors.primary.withOpacity(0.95),
-              letterSpacing: 0.5,
-            ),
-          ),
+          Text(shown, style: _style(fontSize)),
           Text(
             "|",
             style: TextStyle(
@@ -669,7 +694,7 @@ class _InfoChip extends StatelessWidget {
 
     return LiquidGlass(
       borderRadius: 30,
-      blur: 10,
+      blur: 0, // animates continuously — keep it off the BackdropFilter path
       shadow: false,
       padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
       child: Row(

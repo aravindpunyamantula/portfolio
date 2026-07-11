@@ -55,8 +55,13 @@ class LiquidGlass extends StatelessWidget {
     final shape = ContinuousRectangleBorder(
       borderRadius: BorderRadius.circular(borderRadius * 1.6),
     );
+    // blur: 0 skips the BackdropFilter entirely. Use it for small chips
+    // that sit over dark backgrounds (blur is invisible there) and for
+    // anything that animates continuously — every live BackdropFilter
+    // re-filters its backdrop on every frame of any animation.
+    final noBlur = blur <= 0;
     final fill = tint == null
-        ? Colors.white.withOpacity(baseOpacity + glow * 0.05)
+        ? Colors.white.withOpacity(baseOpacity + glow * 0.05 + (noBlur ? 0.03 : 0))
         : tint!.withOpacity(0.22 + glow * 0.10);
 
     return Container(
@@ -74,9 +79,9 @@ class LiquidGlass extends StatelessWidget {
           : null,
       child: ClipPath(
         clipper: ShapeBorderClipper(shape: shape),
-        child: BackdropFilter(
-          filter: blurAndSaturate(blur),
-          child: CustomPaint(
+        child: _maybeBlur(
+          noBlur,
+          CustomPaint(
             foregroundPainter: _RimPainter(shape: shape, glow: glow),
             child: Container(
               padding: padding,
@@ -100,6 +105,11 @@ class LiquidGlass extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _maybeBlur(bool noBlur, Widget child) {
+    if (noBlur) return child;
+    return BackdropFilter(filter: blurAndSaturate(blur), child: child);
   }
 }
 

@@ -7,9 +7,11 @@ class GlassNavBar extends StatelessWidget {
   final VoidCallback onHomeTap;
   final VoidCallback onProjectsTap;
   final VoidCallback onSkillsTap;
+  final VoidCallback onCertificatesTap;
   final VoidCallback onContactTap;
 
-  /// Index of the section currently in view (0 Home, 1 Projects, 2 Skills, 3 Contact).
+  /// Index of the section currently in view
+  /// (0 Home, 1 Projects, 2 Skills, 3 Certs, 4 Contact).
   final ValueListenable<int> activeSection;
 
   const GlassNavBar({
@@ -17,6 +19,7 @@ class GlassNavBar extends StatelessWidget {
     required this.onHomeTap,
     required this.onProjectsTap,
     required this.onSkillsTap,
+    required this.onCertificatesTap,
     required this.onContactTap,
     required this.activeSection,
   });
@@ -84,9 +87,15 @@ class GlassNavBar extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         _NavItem(
+                          title: "Certs",
+                          onTap: onCertificatesTap,
+                          isActive: active == 3,
+                        ),
+                        const SizedBox(width: 8),
+                        _NavItem(
                           title: "Contact",
                           onTap: onContactTap,
-                          isActive: active == 3,
+                          isActive: active == 4,
                         ),
                       ],
                     );

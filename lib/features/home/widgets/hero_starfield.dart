@@ -90,6 +90,7 @@ class _HeroStarfieldState extends State<HeroStarfield>
   double _modeT = 0; // 0..1 progress of the active one-shot mode
   VoidCallback? _onModeComplete;
   double _meteorSpawnBudget = 0;
+  DateTime _lastInput = DateTime.fromMillisecondsSinceEpoch(0);
 
   final _repaint = _RepaintSignal();
 
@@ -162,11 +163,13 @@ class _HeroStarfieldState extends State<HeroStarfield>
 
   void _onHover(Offset p) {
     _cursor = p;
+    _lastInput = DateTime.now();
     _wake();
   }
 
   void _onDown(Offset p) {
     _cursor = p;
+    _lastInput = DateTime.now();
     _ripples.add(_Ripple(p));
     // One-time shockwave impulse away from the tap.
     for (final s in _stars) {
@@ -266,13 +269,27 @@ class _HeroStarfieldState extends State<HeroStarfield>
 
     _repaint.ping();
 
-    // Sleep when nothing needs animating: hero off-screen and no cursor,
-    // or simply everything settled with no active effect.
+    // Sleep whenever the field is settled: no active effect, no recent
+    // pointer input, and every star at rest. This keeps the main thread
+    // idle when nobody interacts (crucial for perf scores) — any hover,
+    // tap, or effect wakes the ticker again instantly.
     final busy = _mode != _FieldMode.idle ||
         _ripples.isNotEmpty ||
         _meteors.isNotEmpty ||
         _meteorSpawnBudget > 0;
-    if (!_visible && !busy) _ticker.stop();
+    if (busy) return;
+    if (!_visible) {
+      _ticker.stop();
+      return;
+    }
+    final inputAge = DateTime.now().difference(_lastInput);
+    if (inputAge > const Duration(milliseconds: 1500)) {
+      var maxVel = 0.0;
+      for (final s in _stars) {
+        maxVel = max(maxVel, s.vel.distance);
+      }
+      if (maxVel < 4) _ticker.stop();
+    }
   }
 
   @override
