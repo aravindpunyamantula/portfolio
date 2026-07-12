@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:js_interop';
 
 import 'package:flutter/foundation.dart';
@@ -28,6 +29,11 @@ class SoundService {
     Sfx.sent: ('sent.mp3', 0.40), // contact form success (+ toggle-on)
   };
 
+  // ── background music (assets/sfx/ambient.mp3, loops at low volume) ──
+  static web.HTMLAudioElement? _music;
+  static Timer? _fade;
+  static const _musicVolume = 0.12;
+
   /// Restore the persisted preference. Call once from main().
   static void init() {
     try {
@@ -35,6 +41,27 @@ class SoundService {
     } catch (_) {}
     // No preloading here even when enabled — audio only loads on first
     // play, keeping boot quiet for returning visitors too.
+    try {
+      // For returning visitors with sound on: the first real gesture
+      // (pointer/touch) grants the autoplay permission music needs.
+      web.document.addEventListener(
+        'pointerdown',
+        ((web.Event e) {
+          if (enabled.value) _startMusic();
+        }).toJS,
+      );
+      // Don't keep playing in a background tab.
+      web.document.addEventListener(
+        'visibilitychange',
+        ((web.Event e) {
+          if (web.document.hidden) {
+            _music?.pause();
+          } else if (enabled.value && _music != null) {
+            _music!.play().toDart.then((v) => v, onError: (Object _) => null);
+          }
+        }).toJS,
+      );
+    } catch (_) {}
   }
 
   static void toggle() {
@@ -42,8 +69,43 @@ class SoundService {
     try {
       web.window.localStorage.setItem(_storageKey, enabled.value ? '1' : '0');
     } catch (_) {}
-    // Audible confirmation doubles as the browser's "user gesture" unlock.
-    if (enabled.value) play(Sfx.sent);
+    if (enabled.value) {
+      // Audible confirmation doubles as the browser's gesture unlock.
+      play(Sfx.sent);
+      _startMusic();
+    } else {
+      _stopMusic();
+    }
+  }
+
+  /// Warm ambient loop, faded in over ~2.5s. Missing file fails silently.
+  static void _startMusic() {
+    try {
+      _music ??= web.HTMLAudioElement()
+        ..src = 'assets/assets/sfx/ambient.mp3'
+        ..loop = true
+        ..preload = 'auto';
+      if (!_music!.paused) return;
+      _music!.volume = 0;
+      _music!.play().toDart.then((v) => v, onError: (Object _) => null);
+      _fade?.cancel();
+      _fade = Timer.periodic(const Duration(milliseconds: 100), (t) {
+        final v = _music!.volume + _musicVolume / 25;
+        if (v >= _musicVolume) {
+          _music!.volume = _musicVolume;
+          t.cancel();
+        } else {
+          _music!.volume = v;
+        }
+      });
+    } catch (_) {}
+  }
+
+  static void _stopMusic() {
+    _fade?.cancel();
+    try {
+      _music?.pause();
+    } catch (_) {}
   }
 
   static void play(Sfx sfx) {
