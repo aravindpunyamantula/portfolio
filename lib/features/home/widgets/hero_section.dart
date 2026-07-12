@@ -12,8 +12,10 @@ import 'package:portfolio/data/services/github_stats_service.dart';
 import 'package:portfolio/data/services/urls_launcher_service.dart';
 import 'package:portfolio/features/home/widgets/hero_starfield.dart';
 import 'package:portfolio/widgets/glass/glass_button.dart';
+import 'package:portfolio/widgets/glass/glass_snackbar.dart';
 import 'package:portfolio/widgets/glass/liquid_glass.dart';
 import 'package:provider/provider.dart';
+import 'package:web/web.dart' as web;
 
 class HeroSection extends StatefulWidget {
   final VoidCallback tapProject;
@@ -33,17 +35,41 @@ class _HeroSectionState extends State<HeroSection> {
 
   // Easter egg: typing "aravind" anywhere summons a meteor shower.
   String _typed = '';
+  bool _meteorsFound = false;
+  Timer? _hintTimer;
   Future<GithubStats?>? _statsFuture;
   String _statsUser = '';
+
+  static const _hintKey = 'egg_hint_shown';
 
   @override
   void initState() {
     super.initState();
     HardwareKeyboard.instance.addHandler(_onKey);
+    // One-time discoverability nudge for the meteor egg: a faint toast
+    // after 30s, desktop only, never repeated on later visits.
+    _hintTimer = Timer(const Duration(seconds: 30), _maybeShowHint);
+  }
+
+  void _maybeShowHint() {
+    if (!mounted || _meteorsFound) return;
+    if (Responsive.isMobile(context)) return;
+    try {
+      if (web.window.localStorage.getItem(_hintKey) == '1') return;
+      web.window.localStorage.setItem(_hintKey, '1');
+    } catch (_) {}
+    showGlassSnackBar(
+      context,
+      message: "psst — try typing my name",
+      icon: Icons.auto_awesome_rounded,
+      accent: const Color(0xFF8B5CF6),
+      duration: const Duration(seconds: 7),
+    );
   }
 
   @override
   void dispose() {
+    _hintTimer?.cancel();
     HardwareKeyboard.instance.removeHandler(_onKey);
     super.dispose();
   }
@@ -62,6 +88,10 @@ class _HeroSectionState extends State<HeroSection> {
     if (_typed.length > 16) _typed = _typed.substring(_typed.length - 16);
     if (_typed.endsWith('aravind')) {
       _typed = '';
+      _meteorsFound = true; // found it — no hint needed, ever
+      try {
+        web.window.localStorage.setItem(_hintKey, '1');
+      } catch (_) {}
       _field.meteorShower();
     }
     return false;

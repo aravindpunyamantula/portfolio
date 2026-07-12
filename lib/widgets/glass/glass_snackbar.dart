@@ -12,6 +12,7 @@ void showGlassSnackBar(
   required String message,
   IconData icon = Icons.check_circle_rounded,
   Color accent = AppColors.primary,
+  Duration duration = const Duration(seconds: 4),
 }) {
   final width = MediaQuery.of(context).size.width;
   final messenger = ScaffoldMessenger.of(context);
@@ -23,7 +24,7 @@ void showGlassSnackBar(
       elevation: 0,
       padding: EdgeInsets.zero,
       width: min(440, width - 32),
-      duration: const Duration(seconds: 4),
+      duration: duration,
       content: ClipRRect(
         borderRadius: BorderRadius.circular(18),
         child: BackdropFilter(
