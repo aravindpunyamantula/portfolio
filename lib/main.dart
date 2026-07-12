@@ -37,6 +37,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ContentService()..load()),
       ],
       child: MaterialApp(
+        // Without this, Flutter overwrites the HTML <title> with an empty
+        // string at boot — failing SEO/a11y "document has a title" audits.
+        title: 'P D S Aravind Kumar | Full Stack Developer',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
         home: IntroPage(),

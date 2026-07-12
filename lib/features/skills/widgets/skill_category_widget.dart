@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:portfolio/core/utils/animation_gate.dart';
 import 'package:portfolio/data/models/skill_category.dart';
 import 'package:portfolio/features/skills/widgets/skill_planet.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -35,10 +36,24 @@ class _SkillCategoryWidgetState extends State<SkillCategoryWidget>
   late final AnimationController idleSpin = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 60),
-  )..repeat();
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _maybeSpin();
+    AnimationGate.open.addListener(_maybeSpin);
+  }
+
+  void _maybeSpin() {
+    if (AnimationGate.open.value && !idleSpin.isAnimating && mounted) {
+      idleSpin.repeat();
+    }
+  }
 
   @override
   void dispose() {
+    AnimationGate.open.removeListener(_maybeSpin);
     idleSpin.dispose();
     super.dispose();
   }

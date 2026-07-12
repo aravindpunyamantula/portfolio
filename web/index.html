@@ -5,6 +5,15 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    // The Flutter engine rewrites the viewport meta with user-scalable=no
+    // at boot, which fails accessibility/best-practice audits and blocks
+    // pinch zoom. Restore a zoomable viewport once the first frame is up.
+    window.addEventListener('flutter-first-frame', function () {
+      var m = document.querySelector('meta[name="viewport"]');
+      if (m) m.setAttribute('content', 'width=device-width, initial-scale=1.0');
+    });
+  </script>
 
   <!-- Primary SEO -->
   <title>P D S Aravind Kumar | Full Stack Developer</title>

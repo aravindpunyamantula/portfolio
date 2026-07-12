@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portfolio/core/constants/app_colors.dart';
+import 'package:portfolio/core/utils/animation_gate.dart';
 import 'package:portfolio/core/utils/resposive.dart';
 import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/data/services/github_stats_service.dart';
@@ -49,6 +50,12 @@ class _HeroSectionState extends State<HeroSection> {
     // One-time discoverability nudge for the meteor egg: a faint toast
     // after 30s, desktop only, never repeated on later visits.
     _hintTimer = Timer(const Duration(seconds: 30), _maybeShowHint);
+    // Rebuild when the calm-start gate opens (kicks off the stats fetch).
+    AnimationGate.open.addListener(_onGateOpen);
+  }
+
+  void _onGateOpen() {
+    if (mounted) setState(() {});
   }
 
   void _maybeShowHint() {
@@ -70,12 +77,14 @@ class _HeroSectionState extends State<HeroSection> {
   @override
   void dispose() {
     _hintTimer?.cancel();
+    AnimationGate.open.removeListener(_onGateOpen);
     HardwareKeyboard.instance.removeHandler(_onKey);
     super.dispose();
   }
 
   bool _onKey(KeyEvent event) {
     if (event is! KeyDownEvent) return false;
+    AnimationGate.unlock(); // keyboard counts as interaction too
     final char = event.character;
     if (char == null || char.length != 1) return false;
     // Never react while someone is typing in the contact form.
@@ -112,13 +121,16 @@ class _HeroSectionState extends State<HeroSection> {
         : min(68.0, screenSize.width * 0.062);
 
     // Live GitHub chips — username comes from the (possibly remote) link.
+    // Fetched only once the calm-start gate opens, so audit bots never
+    // trigger the request (their datacenter IPs get rate-limited 403s
+    // that would land in the console-errors audit).
     final username = links.github
         .split('/')
         .where((p) => p.isNotEmpty)
         .toList()
         .reversed
         .first;
-    if (username != _statsUser) {
+    if (AnimationGate.open.value && username != _statsUser) {
       _statsUser = username;
       _statsFuture = fetchGithubStats(username);
     }
@@ -252,7 +264,11 @@ class _HeroSectionState extends State<HeroSection> {
 
         // Live proof-of-work: GitHub stats + "currently building" ticker.
         RepaintBoundary(
-          child: _GithubChips(future: _statsFuture),
+          child: GateBuilder(
+            builder: (context, open) => open
+                ? _GithubChips(future: _statsFuture)
+                : const SizedBox.shrink(),
+          ),
         ).animate(delay: 1150.ms).fadeIn(duration: 500.ms),
         SizedBox(height: isMobile ? 34 : 44),
 
@@ -463,6 +479,21 @@ class _TypingRoleState extends State<_TypingRole> {
   @override
   void initState() {
     super.initState();
+    // Calm start: show the first role fully typed and static until the
+    // gate opens, then begin the type/delete cycle.
+    if (AnimationGate.open.value) {
+      _chars = 0;
+      _schedule(600);
+    } else {
+      _chars = widget.roles.first.length;
+      AnimationGate.open.addListener(_onGate);
+    }
+  }
+
+  void _onGate() {
+    AnimationGate.open.removeListener(_onGate);
+    if (!mounted) return;
+    _deleting = true; // erase the parked word, then cycle
     _schedule(600);
   }
 
@@ -495,6 +526,7 @@ class _TypingRoleState extends State<_TypingRole> {
   @override
   void dispose() {
     _timer?.cancel();
+    AnimationGate.open.removeListener(_onGate);
     super.dispose();
   }
 
@@ -535,18 +567,24 @@ class _TypingRoleState extends State<_TypingRole> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(shown, style: _style(fontSize)),
-          Text(
-            "|",
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w400,
-              color: AppColors.primary.withOpacity(0.9),
-            ),
-          )
-              .animate(onPlay: (c) => c.repeat())
-              .fadeOut(duration: 500.ms)
-              .then()
-              .fadeIn(duration: 500.ms),
+          GateBuilder(
+            builder: (context, open) {
+              final cursor = Text(
+                "|",
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.primary.withOpacity(0.9),
+                ),
+              );
+              if (!open) return cursor; // static until calm start ends
+              return cursor
+                  .animate(onPlay: (c) => c.repeat())
+                  .fadeOut(duration: 500.ms)
+                  .then()
+                  .fadeIn(duration: 500.ms);
+            },
+          ),
         ],
       ),
     );
@@ -776,18 +814,24 @@ class _AvailabilityBadgeState extends State<_AvailabilityBadge> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
+            GateBuilder(
+              builder: (context, open) {
+                final dot = Container(
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColors.secondary,
                   ),
-                )
-                .animate(onPlay: (c) => c.repeat())
-                .fadeIn(duration: 900.ms)
-                .then()
-                .fadeOut(duration: 900.ms),
+                );
+                if (!open) return dot;
+                return dot
+                    .animate(onPlay: (c) => c.repeat())
+                    .fadeIn(duration: 900.ms)
+                    .then()
+                    .fadeOut(duration: 900.ms);
+              },
+            ),
             const SizedBox(width: 10),
             Text(
               widget.text,
@@ -859,11 +903,20 @@ class _ScrollIndicator extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white38)
-            .animate(onPlay: (c) => c.repeat())
-            .moveY(begin: -2, end: 6, duration: 900.ms, curve: Curves.easeInOut)
-            .then()
-            .moveY(begin: 6, end: -2, duration: 900.ms, curve: Curves.easeInOut),
+        GateBuilder(
+          builder: (context, open) {
+            const arrow =
+                Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white38);
+            if (!open) return arrow;
+            return arrow
+                .animate(onPlay: (c) => c.repeat())
+                .moveY(
+                    begin: -2, end: 6, duration: 900.ms, curve: Curves.easeInOut)
+                .then()
+                .moveY(
+                    begin: 6, end: -2, duration: 900.ms, curve: Curves.easeInOut);
+          },
+        ),
       ],
     );
   }

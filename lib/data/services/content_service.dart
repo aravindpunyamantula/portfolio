@@ -35,8 +35,12 @@ class ContentService extends ChangeNotifier {
 
   Future<void> _fetchRemote() async {
     try {
+      // Per-minute cache-buster: raw.githubusercontent serves with a
+      // 5-minute cache header, which made content edits feel "stuck".
+      // A unique query string bypasses both browser and CDN caches.
+      final buster = DateTime.now().millisecondsSinceEpoch ~/ 60000;
       final response = await http
-          .get(Uri.parse(_remoteUrl))
+          .get(Uri.parse('$_remoteUrl?t=$buster'))
           .timeout(const Duration(seconds: 10));
       if (response.statusCode != 200) return;
       _apply(response.body);

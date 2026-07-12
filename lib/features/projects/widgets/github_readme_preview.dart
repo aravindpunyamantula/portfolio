@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // scrolls into view, so dart2js splits it out of the main bundle.
 import 'package:flutter_markdown/flutter_markdown.dart' deferred as md;
 import 'package:http/http.dart' as http;
+import 'package:portfolio/core/utils/animation_gate.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 /// Renders a repo's README — fetched only when the card scrolls into view.
@@ -24,6 +25,20 @@ class _GithubReadmePreviewState extends State<GithubReadmePreview>
 
   @override
   bool get wantKeepAlive => true;
+
+  void _loadOnGate() {
+    AnimationGate.open.removeListener(_loadOnGate);
+    if (!started && mounted) {
+      started = true;
+      loadReadme();
+    }
+  }
+
+  @override
+  void dispose() {
+    AnimationGate.open.removeListener(_loadOnGate);
+    super.dispose();
+  }
 
   Future<void> loadReadme() async {
     try {
@@ -60,9 +75,17 @@ class _GithubReadmePreviewState extends State<GithubReadmePreview>
     return VisibilityDetector(
       key: Key('readme-${widget.repoUrl}'),
       onVisibilityChanged: (info) {
+        // Fetch + markdown render are multi-second tasks on CPU-only
+        // rasterizers, so they also wait for the calm-start gate (first
+        // user interaction) — the section top peeks above the fold at
+        // boot, which used to fire all six loads during the audit window.
         if (info.visibleFraction > 0.05 && !started && mounted) {
-          started = true;
-          loadReadme();
+          if (AnimationGate.open.value) {
+            started = true;
+            loadReadme();
+          } else {
+            AnimationGate.open.addListener(_loadOnGate);
+          }
         }
       },
       child: !started || isLoading

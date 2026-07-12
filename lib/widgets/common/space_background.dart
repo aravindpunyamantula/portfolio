@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:portfolio/core/utils/animation_gate.dart';
 
 class Star {
   double x;
@@ -41,7 +42,16 @@ class _SpaceBackgroundState extends State<SpaceBackground>
     controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 60),
-    )..repeat();
+    );
+    // Stars render one static frame until the calm-start gate opens.
+    _maybeStart();
+    AnimationGate.open.addListener(_maybeStart);
+  }
+
+  void _maybeStart() {
+    if (AnimationGate.open.value && !controller.isAnimating && mounted) {
+      controller.repeat();
+    }
   }
 
   bool _starsGenerated = false;
@@ -58,6 +68,7 @@ class _SpaceBackgroundState extends State<SpaceBackground>
 
   @override
   void dispose() {
+    AnimationGate.open.removeListener(_maybeStart);
     controller.dispose();
     super.dispose();
   }
@@ -144,10 +155,24 @@ class _NebulaBackgroundState extends State<NebulaBackground>
   late final AnimationController controller = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 36),
-  )..repeat();
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _maybeStart();
+    AnimationGate.open.addListener(_maybeStart);
+  }
+
+  void _maybeStart() {
+    if (AnimationGate.open.value && !controller.isAnimating && mounted) {
+      controller.repeat();
+    }
+  }
 
   @override
   void dispose() {
+    AnimationGate.open.removeListener(_maybeStart);
     controller.dispose();
     super.dispose();
   }
@@ -225,9 +250,24 @@ class _ShootingStarState extends State<ShootingStar>
       duration: const Duration(seconds: 2),
     );
 
-    Future.delayed(const Duration(seconds: 3), () {
-      controller.forward();
+    // Fire once, shortly after the calm-start gate opens.
+    AnimationGate.open.addListener(_onGate);
+    _onGate();
+  }
+
+  void _onGate() {
+    if (!AnimationGate.open.value) return;
+    AnimationGate.open.removeListener(_onGate);
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) controller.forward();
     });
+  }
+
+  @override
+  void dispose() {
+    AnimationGate.open.removeListener(_onGate);
+    controller.dispose();
+    super.dispose();
   }
 
   @override

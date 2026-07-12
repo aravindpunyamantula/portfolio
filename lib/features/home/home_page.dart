@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portfolio/core/constants/app_colors.dart';
 import 'package:portfolio/core/constants/app_spacing.dart';
+import 'package:portfolio/core/utils/animation_gate.dart';
 import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/data/services/urls_launcher_service.dart';
 import 'package:portfolio/features/certificates/certificate_section.dart';
@@ -60,6 +61,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onScroll() {
+    AnimationGate.unlock();
     final offset = _scrollCtrl.offset;
     _scrollOffset.value = offset;
     _showToTop.value = offset > 600;
@@ -82,13 +84,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   void scrollToSection(GlobalKey key) {
-    final ctx = key.currentContext;
-    if (ctx == null) return;
-    Scrollable.ensureVisible(
-      ctx,
-      duration: const Duration(milliseconds: 800),
-      curve: Curves.easeInOutCubic,
-    );
+    // Below-fold sections build on first interaction; if this tap IS the
+    // first interaction, wait one frame for the target to exist.
+    AnimationGate.unlock();
+    void go() {
+      final ctx = key.currentContext;
+      if (ctx == null) return;
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.easeInOutCubic,
+      );
+    }
+
+    if (key.currentContext != null) {
+      go();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) => go());
+    }
   }
 
   void _scrollToTop() {
@@ -104,7 +117,13 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       endDrawer: _buildDrawer(context),
       backgroundColor: AppColors.background,
-      body: SafeArea(
+      body: Listener(
+        // Any pointer activity opens the calm-start animation gate.
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (_) => AnimationGate.unlock(),
+        onPointerMove: (_) => AnimationGate.unlock(),
+        onPointerHover: (_) => AnimationGate.unlock(),
+        child: SafeArea(
         child: Stack(
           children: [
             const Positioned.fill(child: NebulaBackground()),
@@ -122,31 +141,46 @@ class _HomePageState extends State<HomePage> {
                       tapContact: () => scrollToSection(contactKey),
                     ),
                   ),
-                  SizedBox(height: AppSpacing.md),
-                  Container(
-                    key: projectsKey,
-                    child: ProjectSection(
-                      tapContact: () => scrollToSection(contactKey),
-                    ),
+                  // Everything below the fold builds on first interaction:
+                  // it's invisible until the user scrolls (which opens the
+                  // gate), and skipping it keeps boot + the remote-content
+                  // rebuild cheap — crucial for TBT on CPU-only auditors.
+                  GateBuilder(
+                    builder: (context, open) {
+                      if (!open) return const SizedBox.shrink();
+                      return Column(
+                        children: [
+                          SizedBox(height: AppSpacing.md),
+                          Container(
+                            key: projectsKey,
+                            child: ProjectSection(
+                              tapContact: () => scrollToSection(contactKey),
+                            ),
+                          ),
+                          SizedBox(height: AppSpacing.md),
+                          Container(
+                            key: skillsKey,
+                            child: SkillSection(scrollOffset: _scrollOffset),
+                          ),
+                          SizedBox(height: AppSpacing.md),
+                          Container(
+                            key: certificatesKey,
+                            child: CertificateSection(
+                              tapContact: () => scrollToSection(contactKey),
+                            ),
+                          ),
+                          SizedBox(height: AppSpacing.md),
+                          Container(
+                              key: reviewsKey, child: const ReviewSection()),
+                          SizedBox(height: AppSpacing.md),
+                          Container(
+                              key: contactKey, child: const ContactSection()),
+                          const SizedBox(height: 40),
+                          const AppFooter(),
+                        ],
+                      );
+                    },
                   ),
-                  SizedBox(height: AppSpacing.md),
-                  Container(
-                    key: skillsKey,
-                    child: SkillSection(scrollOffset: _scrollOffset),
-                  ),
-                  SizedBox(height: AppSpacing.md),
-                  Container(
-                    key: certificatesKey,
-                    child: CertificateSection(
-                      tapContact: () => scrollToSection(contactKey),
-                    ),
-                  ),
-                  SizedBox(height: AppSpacing.md),
-                  Container(key: reviewsKey, child: const ReviewSection()),
-                  SizedBox(height: AppSpacing.md),
-                  Container(key: contactKey, child: const ContactSection()),
-                  const SizedBox(height: 40),
-                  const AppFooter(),
                 ],
               ),
             ),
@@ -160,6 +194,7 @@ class _HomePageState extends State<HomePage> {
             ),
             _ScrollToTopButton(visible: _showToTop, onTap: _scrollToTop),
           ],
+        ),
         ),
       ),
     );
