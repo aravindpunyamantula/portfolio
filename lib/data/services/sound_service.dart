@@ -23,8 +23,8 @@ class SoundService {
 
   /// filename in assets/sfx/ + playback volume per effect.
   static const _files = <Sfx, (String, double)>{
-    Sfx.warp: ('warp.mp3', 0.35), // "View Projects" hyperspace jump
-    Sfx.blackhole: ('blackhole.mp3', 0.40), // badge double-tap collapse
+    Sfx.warp: ('warp.mp3', 0.22), // "View Projects" hyperspace jump
+    Sfx.blackhole: ('blackhole.mp3', 0.26), // badge double-tap collapse
     Sfx.meteors: ('meteors.mp3', 0.30), // typing-the-name meteor shower
     Sfx.sent: ('sent.mp3', 0.40), // contact form success (+ toggle-on)
   };
