@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portfolio/core/constants/app_colors.dart';
 import 'package:portfolio/core/constants/app_spacing.dart';
 import 'package:portfolio/core/utils/animation_gate.dart';
+import 'package:portfolio/data/services/sound_service.dart';
 import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/data/services/urls_launcher_service.dart';
 import 'package:portfolio/features/certificates/certificate_section.dart';
@@ -193,6 +194,7 @@ class _HomePageState extends State<HomePage> {
               onContactTap: () => scrollToSection(contactKey),
             ),
             _ScrollToTopButton(visible: _showToTop, onTap: _scrollToTop),
+            const _SoundToggleButton(),
           ],
         ),
         ),
@@ -413,6 +415,46 @@ class _DrawerSocialIcon extends StatelessWidget {
           border: Border.all(color: Colors.white.withOpacity(0.12)),
         ),
         child: FaIcon(icon, size: 16, color: Colors.white70),
+      ),
+    );
+  }
+}
+
+class _SoundToggleButton extends StatelessWidget {
+  const _SoundToggleButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 24,
+      bottom: 24,
+      child: ValueListenableBuilder<bool>(
+        valueListenable: SoundService.enabled,
+        builder: (context, on, _) {
+          return Tooltip(
+            message: on ? "Sound effects: on" : "Sound effects: off",
+            child: LiquidGlassHover(
+              cursor: SystemMouseCursors.click,
+              builder: (context, hovering) {
+                return GestureDetector(
+                  onTap: SoundService.toggle,
+                  child: LiquidGlass(
+                    borderRadius: 18,
+                    blur: 16,
+                    shadow: false,
+                    glow: hovering ? 1 : 0,
+                    padding: const EdgeInsets.all(12),
+                    child: Icon(
+                      on ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+                      size: 18,
+                      color: on ? Colors.white : Colors.white38,
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:portfolio/data/services/sound_service.dart';
 import 'package:portfolio/core/theme/app_theme.dart';
 import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/data/services/email_service.dart';
@@ -20,6 +21,7 @@ const kFontAwesomeIconsInUse = <FaIconData>[
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  SoundService.init();
 
   runApp(const MyApp());
 }

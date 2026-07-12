@@ -10,6 +10,7 @@ import 'package:portfolio/core/utils/animation_gate.dart';
 import 'package:portfolio/core/utils/resposive.dart';
 import 'package:portfolio/data/services/content_service.dart';
 import 'package:portfolio/data/services/github_stats_service.dart';
+import 'package:portfolio/data/services/sound_service.dart';
 import 'package:portfolio/data/services/urls_launcher_service.dart';
 import 'package:portfolio/features/home/widgets/hero_starfield.dart';
 import 'package:portfolio/widgets/glass/glass_button.dart';
@@ -101,6 +102,7 @@ class _HeroSectionState extends State<HeroSection> {
       try {
         web.window.localStorage.setItem(_hintKey, '1');
       } catch (_) {}
+      SoundService.play(Sfx.meteors);
       _field.meteorShower();
     }
     return false;
@@ -145,8 +147,10 @@ class _HeroSectionState extends State<HeroSection> {
               text: hero.availability,
               // Easter egg: double-tap collapses the starfield into a
               // black hole, then warps down to the contact section.
-              onDoubleTap: () =>
-                  _field.blackHole(onComplete: widget.tapContact),
+              onDoubleTap: () {
+                SoundService.play(Sfx.blackhole);
+                _field.blackHole(onComplete: widget.tapContact);
+              },
             ),
           ).animate().fadeIn(duration: 500.ms).slideY(
               begin: 0.4, curve: Curves.easeOutCubic),
@@ -206,6 +210,7 @@ class _HeroSectionState extends State<HeroSection> {
               child: GlassButton(
                 text: "View Projects",
                 onTap: () {
+                  SoundService.play(Sfx.warp);
                   _field.warp();
                   widget.tapProject();
                 },

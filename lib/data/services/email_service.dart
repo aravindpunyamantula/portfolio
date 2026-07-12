@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:portfolio/data/services/sound_service.dart';
 import 'package:portfolio/widgets/glass/glass_snackbar.dart';
 
 class EmailService extends ChangeNotifier {
@@ -49,6 +50,7 @@ class EmailService extends ChangeNotifier {
 
       if (!context.mounted) return;
       if (response.statusCode == 200) {
+        SoundService.play(Sfx.sent);
         showGlassSnackBar(
           context,
           message: "Message sent — I'll get back to you soon!",
