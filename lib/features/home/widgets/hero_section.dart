@@ -252,21 +252,7 @@ class _HeroSectionState extends State<HeroSection> {
 
         // Live proof-of-work: GitHub stats + "currently building" ticker.
         RepaintBoundary(
-          child: Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              _GithubChips(future: _statsFuture),
-              if (hero.currentlyBuilding.isNotEmpty)
-                _InfoChip(
-                  dotColor: const Color(0xFFF59E0B),
-                  pulse: true,
-                  text: "Building: ${hero.currentlyBuilding}",
-                ),
-            ],
-          ),
+          child: _GithubChips(future: _statsFuture),
         ).animate(delay: 1150.ms).fadeIn(duration: 500.ms),
         SizedBox(height: isMobile ? 34 : 44),
 
@@ -671,15 +657,16 @@ class _GithubChips extends StatelessWidget {
         return Wrap(
           spacing: 10,
           runSpacing: 10,
+          alignment: WrapAlignment.center,
           children: [
             _InfoChip(
               icon: Icons.folder_rounded,
               text: "${stats.repos} repos",
             ),
-            if (stats.stars > 0)
+            if (stats.commits > 0)
               _InfoChip(
-                icon: Icons.star_rounded,
-                text: "${stats.stars} stars",
+                icon: Icons.commit_rounded,
+                text: "${stats.commits} commits this year",
               ),
           ],
         );
