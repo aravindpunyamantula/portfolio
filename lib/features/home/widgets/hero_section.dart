@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -119,8 +120,8 @@ class _HeroSectionState extends State<HeroSection> {
     // Scale the headline with viewport width so it never wraps awkwardly
     // on tablets or small phones.
     final nameSize = isMobile
-        ? min(40.0, screenSize.width * 0.105)
-        : min(68.0, screenSize.width * 0.062);
+        ? min(44.0, screenSize.width * 0.115)
+        : min(76.0, screenSize.width * 0.068);
 
     // Live GitHub chips — username comes from the (possibly remote) link.
     // Fetched only once the calm-start gate opens, so audit bots never
@@ -141,22 +142,7 @@ class _HeroSectionState extends State<HeroSection> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        if (hero.showAvailability) ...[
-          RepaintBoundary(
-            child: _AvailabilityBadge(
-              text: hero.availability,
-              // Easter egg: double-tap collapses the starfield into a
-              // black hole, then warps down to the contact section.
-              onDoubleTap: () {
-                SoundService.play(Sfx.blackhole);
-                _field.blackHole(onComplete: widget.tapContact);
-              },
-            ),
-          ).animate().fadeIn(duration: 500.ms).slideY(
-              begin: 0.4, curve: Curves.easeOutCubic),
-          SizedBox(height: isMobile ? 28 : 36),
-        ],
-
+        // ── Headline first: greeting, then the name as the big statement ──
         Text(
           hero.greeting,
           style: TextStyle(
@@ -165,7 +151,7 @@ class _HeroSectionState extends State<HeroSection> {
             letterSpacing: 1,
           ),
         )
-            .animate(delay: 150.ms)
+            .animate(delay: 100.ms)
             .fadeIn(duration: 500.ms)
             .slideY(begin: 0.4, curve: Curves.easeOutCubic),
         const SizedBox(height: 12),
@@ -175,29 +161,29 @@ class _HeroSectionState extends State<HeroSection> {
           text: isMobile ? hero.nameShort : hero.name,
           fontSize: nameSize,
           interactive: !isMobile,
-        ).animate(delay: 250.ms).fadeIn(duration: 400.ms),
-        SizedBox(height: isMobile ? 16 : 20),
+        ).animate(delay: 200.ms).fadeIn(duration: 400.ms),
+        SizedBox(height: isMobile ? 28 : 36),
 
-        RepaintBoundary(child: _TypingRole(roles: hero.roles, isMobile: isMobile))
-            .animate(delay: 500.ms)
-            .fadeIn(duration: 500.ms),
-        SizedBox(height: isMobile ? 20 : 24),
-
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
-          child: Text(
-            hero.tagline,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: isMobile ? 15 : 17,
-              color: AppColors.textSecondary,
-              height: 1.7,
-            ),
-          ),
-        )
-            .animate(delay: 650.ms)
-            .fadeIn(duration: 500.ms)
-            .slideY(begin: 0.3, curve: Curves.easeOutCubic),
+        // ── Centerpiece: a glowing glass "screen" holding the rest ──
+        _HeroCenterpiece(
+          isMobile: isMobile,
+          badge: hero.showAvailability
+              ? _AvailabilityBadge(
+                  text: hero.availability,
+                  // Easter egg: double-tap collapses the starfield into a
+                  // black hole, then warps down to the contact section.
+                  onDoubleTap: () {
+                    SoundService.play(Sfx.blackhole);
+                    _field.blackHole(onComplete: widget.tapContact);
+                  },
+                )
+              : null,
+          typingRole:
+              RepaintBoundary(child: _TypingRole(roles: hero.roles, isMobile: isMobile)),
+          tagline: hero.tagline,
+          statsFuture: _statsFuture,
+        ).animate(delay: 450.ms).fadeIn(duration: 550.ms).slideY(
+            begin: 0.25, curve: Curves.easeOutCubic),
         SizedBox(height: isMobile ? 32 : 40),
 
         Wrap(
@@ -262,23 +248,13 @@ class _HeroSectionState extends State<HeroSection> {
             ),
           ],
         )
-            .animate(delay: 1000.ms)
+            .animate(delay: 950.ms)
             .fadeIn(duration: 500.ms)
             .slideY(begin: 0.3, curve: Curves.easeOutCubic),
-        const SizedBox(height: 22),
-
-        // Live proof-of-work: GitHub stats + "currently building" ticker.
-        RepaintBoundary(
-          child: GateBuilder(
-            builder: (context, open) => open
-                ? _GithubChips(future: _statsFuture)
-                : const SizedBox.shrink(),
-          ),
-        ).animate(delay: 1150.ms).fadeIn(duration: 500.ms),
         SizedBox(height: isMobile ? 34 : 44),
 
         const RepaintBoundary(child: _ScrollIndicator())
-            .animate(delay: 1400.ms)
+            .animate(delay: 1200.ms)
             .fadeIn(),
       ],
     );
@@ -354,9 +330,9 @@ class _HeroNameState extends State<_HeroName> {
 
   TextStyle get _style => TextStyle(
         fontSize: widget.fontSize,
-        fontWeight: FontWeight.w800,
-        height: 1.1,
-        letterSpacing: -1,
+        fontWeight: FontWeight.w900,
+        height: 1.05,
+        letterSpacing: -1.5,
         color: Colors.white,
       );
 
@@ -592,6 +568,98 @@ class _TypingRoleState extends State<_TypingRole> {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Headline-first layout: the glowing "screen" that holds the rest ────
+
+/// Sits directly beneath the name headline — a soft, static glow behind a
+/// glass panel reads as a focal visual (echoes a device-screen mockup)
+/// without adding any per-frame cost: the glow blob never animates.
+class _HeroCenterpiece extends StatelessWidget {
+  final bool isMobile;
+  final Widget? badge;
+  final Widget typingRole;
+  final String tagline;
+  final Future<GithubStats?>? statsFuture;
+
+  const _HeroCenterpiece({
+    required this.isMobile,
+    required this.badge,
+    required this.typingRole,
+    required this.tagline,
+    required this.statsFuture,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        // Static glow blob — no ticker, no animation, just a blurred
+        // radial gradient sitting behind the panel.
+        Positioned(
+          child: IgnorePointer(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
+              child: Container(
+                width: isMobile ? 260 : 420,
+                height: isMobile ? 140 : 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.primary.withOpacity(0.32),
+                      AppColors.primary.withOpacity(0.0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: LiquidGlass(
+            borderRadius: 28,
+            blur: 22,
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 22 : 32,
+              vertical: isMobile ? 24 : 30,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (badge != null) ...[
+                  RepaintBoundary(child: badge!),
+                  SizedBox(height: isMobile ? 18 : 22),
+                ],
+                typingRole,
+                SizedBox(height: isMobile ? 16 : 20),
+                Text(
+                  tagline,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: isMobile ? 14 : 16,
+                    color: AppColors.textSecondary,
+                    height: 1.7,
+                  ),
+                ),
+                SizedBox(height: isMobile ? 16 : 20),
+                RepaintBoundary(
+                  child: GateBuilder(
+                    builder: (context, open) => open
+                        ? _GithubChips(future: statsFuture)
+                        : const SizedBox.shrink(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
