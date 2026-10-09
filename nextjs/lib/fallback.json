@@ -1,0 +1,224 @@
+{
+  "version": 1,
+  "hero": {
+    "greeting": "Hi, I'm",
+    "name": "P. D. S. Aravind Kumar",
+    "nameShort": "Aravind Kumar",
+    "roles": [
+      "Full Stack Developer",
+      "Flutter Developer",
+      "Backend Engineer",
+      "UI Craftsman"
+    ],
+    "tagline": "I design and build scalable, high-performance applications with interfaces people love to use.",
+    "availability": "Open to opportunities",
+    "showAvailability": true,
+    "footerTagline": "Building scalable products with beautiful interfaces.",
+    "currentlyBuilding": "Civic — a civic participation platform"
+  },
+  "links": {
+    "github": "https://github.com/aravindpunyamantula",
+    "linkedin": "https://www.linkedin.com/in/p-d-s-aravind-kumar-a628b02a6/",
+    "instagram": "https://www.instagram.com/p_d_s_aravind_kumar",
+    "email": "mailto:aravindpunyamantula630@gmail.com",
+    "resume": "https://drive.google.com/file/d/18XCFg_NXMDJbGV8IPNR5tQqvWMXWU0HI/view?usp=sharing"
+  },
+  "sections": {
+    "projects": {
+      "eyebrow": "WORK",
+      "title": "Featured Projects",
+      "subtitle": "Products and experiments — from live platforms to open-source builds."
+    },
+    "skills": {
+      "eyebrow": "EXPERTISE",
+      "title": "Tech Universe",
+      "subtitle": "Technologies powering scalable systems, immersive interfaces, and modern digital products — each one in orbit."
+    },
+    "certificates": {
+      "eyebrow": "CREDENTIALS",
+      "title": "Certification Vault",
+      "subtitle": "Credentials that validate expertise — a commitment to excellence and continuous learning."
+    },
+    "reviews": {
+      "eyebrow": "TESTIMONIALS",
+      "title": "What People Say",
+      "subtitle": "Feedback from clients and peers I have built products with."
+    },
+    "contact": {
+      "eyebrow": "CONTACT",
+      "title": "Let's Build Something Exceptional",
+      "subtitle": "Open to collaborations, internships, and ambitious digital experiences."
+    }
+  },
+  "projects": [
+    {
+      "order": 30,
+      "title": "Civic",
+      "description": "Civic is a mobile-first application designed to facilitate structured civic participation. It provides a unified platform where users can document local problems, engage with community-driven discussions, and connect with others based on shared interests and skills.",
+      "githubUrl": "https://github.com/aravindpunyamantula/CIVIC"
+    },
+    {
+      "order": 10,
+      "title": "Cherries Cafe",
+      "description": "A high-performance, SEO-optimized landing page and web platform built to elevate the digital presence of Cherries Cafe, a premium vegetarian restaurant. The application serves as a dynamic digital storefront, driving customer acquisition through modern web design, integrated event booking tools, and automated customer retention features.",
+      "liveUrl": "https://cherriescafe.in"
+    },
+    {
+      "order": 20,
+      "title": "Glamup Gifts",
+      "description": "A highly secure, SEO-optimized e-commerce landing page and digital storefront engineered for a premium gift shop. The platform balances discoverability with robust infrastructure, leveraging modern caching architectures and edge security protocols to deliver rapid load times and mitigate automated threat vectors.",
+      "liveUrl": "https://glamupgifts.com"
+    },
+    {
+      "order": 40,
+      "title": "Offline-Support-ChatBot",
+      "description": "This project demonstrates how to build an offline AI-powered customer support chatbot using Ollama and the Llama 3.2 (3B) language model. The chatbot answers common e-commerce support queries such as order tracking, returns, payments, and account management. Unlike cloud-based AI services, this system runs entirely locally, ensuring that no customer data leaves the machine. The project also evaluates zero-shot and one-shot prompt engineering techniques.",
+      "githubUrl": "https://github.com/aravindpunyamantula/offline-support-chatbot"
+    },
+    {
+      "order": 50,
+      "title": "LLM-Prompt-Router",
+      "description": "This project implements a Node.js service that routes user requests to specialized AI personas based on detected intent. Instead of using a single monolithic prompt for every request, the system first classifies the user's intent using an LLM, and then routes the request to an expert persona designed for that specific task.",
+      "githubUrl": "https://github.com/aravindpunyamantula/LLM-Prompt-Router"
+    },
+    {
+      "order": 60,
+      "title": "Igris",
+      "description": "Igris – Developed a CLI-first AI assistant supporting both local and cloud-hosted LLMs with persistent chat sessions, conversation history, voice interaction, and seamless model switching. Designed with a modular architecture for offline and online AI workflows.",
+      "githubUrl": "https://github.com/aravindpunyamantula/Igris"
+    }
+  ],
+  "certificates": [
+    {
+      "order": 10,
+      "title": "MongoDB Associate Developer",
+      "organisation": "MongoDB",
+      "date": "March 2026",
+      "link": "https://www.credly.com/badges/e452746d-b6d1-4acf-862b-1eb1eb264528/print",
+      "skills": ["MongoDB", "NoSQL"],
+      "imageUrl": "https://cdn.jsdelivr.net/gh/aravindpunyamantula/portfolio-data@main/images/certs/mongodb-associate.png"
+    },
+    {
+      "order": 20,
+      "title": "GitHub Foundations",
+      "organisation": "GitHub",
+      "date": "March 2026",
+      "link": "https://learn.microsoft.com/api/credentials/share/en-gb/AravindKumar-3069/3ED3F9AEA1C13502?sharingId=5389773CB19015D",
+      "skills": ["Git", "GitHub"],
+      "imageUrl": "https://cdn.jsdelivr.net/gh/aravindpunyamantula/portfolio-data@main/images/certs/github-foundations.png"
+    },
+    {
+      "order": 30,
+      "title": "Oracle Cloud Infrastructure 2025 Certified AI Foundations Associate",
+      "organisation": "Oracle",
+      "date": "November 2025",
+      "link": "https://catalog-education.oracle.com/ords/certview/sharebadge?id=6D540D14E0EAEB1CE165371859E721C5D79BA0FAFAE4CADCC467236AE2E061EF",
+      "skills": ["AI Foundations", "Machine Learning"],
+      "imageUrl": "https://cdn.jsdelivr.net/gh/aravindpunyamantula/portfolio-data@main/images/certs/oci-ai-foundations.png"
+    },
+    {
+      "order": 40,
+      "title": "Oracle Certified Foundations Associate, Database",
+      "organisation": "Oracle",
+      "date": "November 2025",
+      "link": "https://catalog-education.oracle.com/ords/certview/sharebadge?id=6D540D14E0EAEB1CE165371859E721C5D79BA0FAFAE4CADCC467236AE2E061EF",
+      "skills": ["SQL", "OracleDB"],
+      "imageUrl": "https://cdn.jsdelivr.net/gh/aravindpunyamantula/portfolio-data@main/images/certs/oracle-database.png"
+    },
+    {
+      "order": 60,
+      "title": "Python Essentials 1",
+      "organisation": "Cisco",
+      "date": "November 2024",
+      "link": "https://www.credly.com/badges/8893586c-f9ba-4d73-bbce-446aac25e299/linked_in_profile",
+      "skills": ["Python"],
+      "imageUrl": "https://cdn.jsdelivr.net/gh/aravindpunyamantula/portfolio-data@main/images/certs/python-essentials.png"
+    },
+    {
+      "order": 50,
+      "title": "Java Programming",
+      "organisation": "Oracle",
+      "date": "October 2024",
+      "link": "",
+      "skills": ["Java"],
+      "imageUrl": "https://cdn.jsdelivr.net/gh/aravindpunyamantula/portfolio-data@main/images/certs/java-programming.png"
+    }
+  ],
+  "skillCategories": [
+    {
+      "title": "Languages",
+      "color": "#6366F1",
+      "skills": ["Dart", "JavaScript", "Java", "C", "Python", "TypeScript"]
+    },
+    {
+      "title": "Frontend",
+      "color": "#06B6D4",
+      "skills": [
+        "Flutter",
+        "React",
+        "HTML",
+        "CSS",
+        "Tailwind CSS",
+        "JavaScript"
+      ]
+    },
+    {
+      "title": "Backend",
+      "color": "#8B5CF6",
+      "skills": [
+        "Java",
+        "Node.js",
+        "Express",
+        "Redis",
+        "RabbitMQ",
+        "Microservices",
+        "REST APIs",
+        "Firebase"
+      ]
+    },
+    {
+      "title": "Database",
+      "color": "#10B981",
+      "skills": [
+        "MongoDB",
+        "MySQL",
+        "OracleDB",
+        "NoSQL",
+        "SQL",
+        "Firestore",
+        "PostgreSQL"
+      ]
+    },
+    {
+      "title": "Tools",
+      "color": "#F59E0B",
+      "skills": [
+        "Git",
+        "GitHub",
+        "Postman",
+        "Docker",
+        "Vercel",
+        "Render",
+        "Cloudflare"
+      ]
+    }
+  ],
+  "reviews": [
+    {
+      "name": "Bhanu Punyamantula",
+      "role": "Owner",
+      "company": "Glamup Gifts",
+      "message": "Working with Aravind was one of the best decisions for our business. He developed our website from scratch with a clean, modern design and a strong focus on performance and user experience. Throughout the project, he communicated clearly, understood our requirements, and delivered everything professionally.\n\nSince launching the website, we have seen excellent results:\n• Over 1,000 daily visitors\n• More than 1000 orders within the first 3 months\n• Faster website performance\n• Smooth mobile and desktop experience\n• A simple and efficient admin workflow\n\nWhat impressed me most was that he didn't just build a website—he built a platform that supports business growth. The site is fast, responsive, SEO-friendly, and provides a seamless shopping experience for customers.\n\nWhenever we needed updates or improvements, he responded quickly and implemented them efficiently.\n\nI highly recommend Aravind to anyone looking for a skilled full-stack web developer who can build scalable, high-quality business websites. We look forward to working with him again on future projects.",
+      "rating": 5,
+      "avatarUrl": ""
+    },
+    {
+      "name": "Narayana Murthy Cheekala",
+      "role": "Owner",
+      "company": "Cherries Cafe",
+      "message": "Working with Aravind was an excellent experience from start to finish. He developed both our website and Android application with a strong focus on quality, performance, and user experience.\n\nHe took the time to understand our restaurant's needs and transformed our ideas into a modern digital platform that truly represents our brand. The website is fast, responsive, SEO-friendly, and makes it easy for customers to explore our menu, learn about our services, and connect with us. The Android app provides a smooth and intuitive experience, making it convenient for our customers to interact with our business.\n\nWhat stood out most was his attention to detail, technical expertise, and willingness to improve every aspect of the product. He was responsive throughout the project, communicated clearly, and delivered updates quickly whenever we requested changes.\n\nSince launching our digital platform, we have received positive feedback from customers about its professional design, speed, and ease of use. The website and app have significantly strengthened our online presence and helped us connect with more customers.\n\nI highly recommend Aravind to any business looking for a dependable Full Stack and Flutter developer who can deliver modern, scalable, and high-quality digital solutions. We look forward to working with him again on future projects.",
+      "rating": 5,
+      "avatarUrl": ""
+    }
+  ]
+}
